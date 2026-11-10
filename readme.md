@@ -3,12 +3,14 @@
 > [!WARNING]
 > **Vastuuvapauslauseke / Disclaimer:** Tämä sovellus on **100 % vibekoodattu Gemini 3.8 Flash High -mallilla**, eikä esitettyjen lukujen, historiallisten poimintojen, parametrien tai ennusteiden oikeellisuudesta anneta **mitään takuita**. Sovellus on tarkoitettu ainoastaan havainnollistavaan ja kokeelliseen tarkasteluun, eikä sitä tule käyttää virallisen päätöksenteon tai taloudellisen neuvonnan perustana.
 
-**SuomiSimulaattori** ([`suomi_simulator.html`](suomi_simulator.html)) on täysin itsenäinen, yhden HTML-tiedoston kokoinen selainpohjainen Suomen julkisen talouden simulointityökalu. Se yhdistää tiedostoon upotetun vuosien 2019–2025 tilastohistorian sekä vuoteen 2050 ulottuvan deterministisen ja 800 kierroksen Monte Carlo -ennustemallin ilman ulkoisia kirjastoja, palvelimia tai internetyhteyttä.
+👉 **[Avaa SuomiSimulaattori suoraan selaimessa](https://markorastas.github.io/SuomiSimulaattori/suomi_simulator.html)**
+
+**SuomiSimulaattori** ([`suomi_simulator.html`](suomi_simulator.html)) on täysin itsenäinen, yhden HTML-tiedoston kokoinen selainpohjainen Suomen julkisen talouden simulointityökalu. Se yhdistää tiedostoon upotetun vuosien 2019–2025 tilastohistorian sekä vuoteen 2050 ulottuvan deterministisen ja 800 kierroksen Monte Carlo -ennustemallin ilman ulkoisia kirjastoja, palvelimia tai asennuksia.
 
 ### Pikakäyttö
-* **Tietokone:** Avaa [`suomi_simulator.html`](suomi_simulator.html) kaksoisklikkaamalla missä tahansa nykyaikaisessa selaimessa (Chrome, Edge, Firefox, Safari).
-* **Android (esim. WhatsAppista):** Napauta tiedostoa ja valitse selaimeksi **Chrome**.
-* **iPhone (esim. WhatsAppista):** WhatsAppin sisäinen esikatselu estää JavaScriptin suorittamisen (sivu näyttää keltaisen varoituspalkin). Napauta **Jaa (`⍐`) → Avaa Safarissa** tai tallenna Tiedostoihin ja avaa Safarissa.
+* **Suoraan verkossa:** Klikkaa yllä olevaa linkkiä ([Avaa SuomiSimulaattori suoraan selaimessa](https://markorastas.github.io/SuomiSimulaattori/suomi_simulator.html)) — toimii suoraan sekä tietokoneella että puhelimessa (Android & iPhone).
+* **Paikallisesti tietokoneella:** Lataa [`suomi_simulator.html`](suomi_simulator.html) ja avaa se kaksoisklikkaamalla missä tahansa selaimessa (toimii myös ilman nettiyhteyttä).
+* **Paikallisen tiedoston jako puhelimeen (esim. WhatsApp):** Androidissa napauta tiedostoa ja valitse **Chrome**; iPhonessa WhatsAppin sisäinen esikatselu estää JavaScriptin (näkyy keltainen varoituspalkki), joten valitse **Jaa (`⍐`) → Avaa Safarissa**.
 
 ---
 
