@@ -56,7 +56,7 @@ Konfiguraatio sisältää kaiken laskennan lähtödatan ilman ulkoisia kutsuja:
 | Avain | Tyyppi | Rooli ja sisältö |
 | :--- | :--- | :--- |
 | `hist` | `Array<Object>` | Vuosien `2019–2025` (7 vuotta) toteutuneet tilasto- ja väestötietueet (StatFin `122g`, `15ah`, `15a9`, `11rs`, `13aj` ja THL Sotkanet `ind. 761`). |
-| `params` | `Object` | Mallin `50` rakenteellista kalibrointi- ja Monte Carlo -parametria (katso taulukko alla). |
+| `params` | `Object` | Mallin `58` rakenteellista kalibrointi-, käyttäytymis-, SFA- ja Monte Carlo -parametria (katso taulukko alla). |
 | `presets` | `Object` | Neljä valmista makrotaloudellista skenaariopohjaa (`Perusskenaario`, `Korkea työperäinen kasvu`, `Korkea humanitaarinen maahanmuutto`, `Tiukka menokuri`). |
 | `forecastYears` | `Array<number>` | Ennustevuosivektori `[2026, 2027, ..., 2050]` ($T = 25$). |
 | `subgroups2025` | `Object` | Vieraskielisen/ulkomaalaistaustaisen `18–64 v` lähtökannan jakauma vuonna 2025: `work_immigrants` (`248 000`), `humanitarian_immigrants` (`187 000`), `student_immigrants` (`42 643`). |
@@ -71,16 +71,16 @@ Konfiguraatio sisältää kaiken laskennan lähtödatan ilman ulkoisia kutsuja:
 #### Vuoden 2025 historialliset lähtöarvot (`hist` viimeinen rivi)
 Julkisyhteisöjen tulot `151,221 mrd. €`, menot `161,966 mrd. €`, alijäämä `-10,745 mrd. €` (`-3,81 %` BKT:sta), nimellinen BKT `281,783 mrd. €`, EDP-velka `249,225 mrd. €` (`88,45 %` BKT:sta), korkomenot `4,559 mrd. €` (`3,01 %` tuloista), väkiluku `5 652 881` (`pop_0_17 = 1 004 036`, `pop_18_64 = 3 301 351` joista suomalaistaustaisia `2 823 708` ja ulkomaalaistaustaisia `477 643`, `pop_65_74 = 672 046`, `pop_75_plus = 675 448`), työlliset `15–74 v` `2 590 000`.
 
-#### `params`-oletusarvot (`50` parametria)
-* **Työmarkkinat & palkat:** `inflation_rate = 0.02`, `native_base_employment_rate = 0.74`, `work_imm_employment_rate = 0.82`, `student_employment_rate = 0.45`, `elderly_65_74_employment_rate = 0.13`, keskipalkat `native_avg_wage_eur = 46 000`, `work_imm_avg_wage_eur = 44 500`, `humanitarian_avg_wage_eur = 33 000`, `student_avg_wage_eur = 22 000`, `elderly_65_74_avg_wage_eur = 32 000`.
-* **Veroparametrit:** `effective_wage_tax_soc_rate = 0.56`, `pension_income_tax_rate = 0.225`, `net_disposable_wage_share = 0.70`, `consumption_tax_rate = 0.215`, `autonomous_indirect_tax_gdp_share = 0.0445`, `social_clawback_rate = 0.18`, `corp_capital_property_gdp_share = 0.1413`.
+#### `params`-oletusarvot (`58` parametria)
+* **Työmarkkinat & palkat:** `inflation_rate = 0.02`, `native_base_employment_rate = 0.74`, `work_imm_employment_rate = 0.82`, `grad_student_employment_rate = 0.78`, `student_employment_rate = 0.45`, `elderly_65_74_employment_rate = 0.13`, keskipalkat `native_avg_wage_eur = 46 000`, `work_imm_avg_wage_eur = 44 500`, `grad_student_avg_wage_eur = 41 000`, `humanitarian_avg_wage_eur = 33 000`, `student_avg_wage_eur = 22 000`, `elderly_65_74_avg_wage_eur = 32 000`.
+* **Veroparametrit, lukukausimaksut & joustot:** `effective_wage_tax_soc_rate = 0.56`, `pension_income_tax_rate = 0.225`, `net_disposable_wage_share = 0.70`, `consumption_tax_rate = 0.215`, `autonomous_indirect_tax_gdp_share = 0.0445`, `social_clawback_rate = 0.18`, `corp_capital_property_gdp_share = 0.1413`, `student_tuition_fee_eur = 4 500`, `tax_emp_elasticity = -0.22`, `benefit_emp_elasticity = -0.06`, `fiscal_multiplier_short = 0.45`.
 * **Sosiaaliturva-, sote- ja eläkemenot (`€/hlö/v`):** `native_social_cost_per_non_emp_eur = 12 500`, `work_imm_social_cost_per_non_emp_eur = 9 800`, `humanitarian_social_cost_per_non_emp_eur = 19 000`, `humanitarian_integration_cost_per_recent_eur = 6 500` (0–2 v maassa olleet), `student_social_cost_per_non_emp_eur = 2 800`, `sote_edu_cost_0_17_eur = 13 800`, `sote_edu_cost_18_64_eur = 4 200`, `sote_edu_cost_65_74_eur = 8 800`, `sote_edu_cost_75_plus_eur = 24 500`, `pension_cost_per_65_plus_eur = 32 280`, `base_2025_fixed_exp_bn = 51.837`.
 * **Demografia:** `avg_study_duration_years = 3.5`, `mortality_rate_0_17 = 0.0004`, `mortality_rate_18_64 = 0.0022`, `mortality_rate_65_74 = 0.014`, `mortality_rate_75_plus_2025 = 0.064`, `mortality_rate_75_plus_2050 = 0.055`.
-* **Velka & kriisikriteerit:** `base_2025_effective_debt_rate = 0.0183`, `debt_rollover_years = 7.0`, `risk_premium_debt_threshold = 0.90`, `risk_premium_interest_rev_threshold = 0.08`, `crisis_debt_threshold = 1.20`, `crisis_interest_rev_threshold = 0.15`.
+* **Velka, S1314/SFA & kriisikriteerit:** `base_2025_effective_debt_rate = 0.0183`, `debt_rollover_years = 7.0`, `risk_premium_debt_threshold = 0.90`, `risk_premium_interest_rev_threshold = 0.08`, `crisis_debt_threshold = 1.20`, `crisis_interest_rev_threshold = 0.15`, `pension_fund_surplus_gdp_share = 0.0105`, `stock_flow_adj_gdp_share = 0.0035`.
 * **Monte Carlo & AR(1):** `n_simulations = 800`, `random_seed = 42`, `mc_productivity_phi = 0.45`, `mc_productivity_sigma = 0.011`, `mc_employment_phi = 0.65`, `mc_employment_sigma = 0.018`, `mc_interest_phi = 0.75`, `mc_interest_sigma = 0.0085`, `mc_migration_phi = 0.60`, `mc_migration_sigma = 6500.0`.
 
-#### `presets` (4 valmiin skenaarion ohjausarvot)
-| Parametri | Perusskenaario | Korkea työperäinen | Korkea humanitaarinen | Tiukka menokuri |
+#### `presets` — Neljän valmiin skenaarion oletukset ja mallitulokset (`2025 / 2035 / 2050`, mediaani `p50`)
+| Parametri / Mittari | Perusskenaario | Korkea työperäinen | Korkea humanitaarinen | Tiukka menokuri |
 | :--- | :---: | :---: | :---: | :---: |
 | `native_emp_change_pp` | `0.0` | `+3.5` | `-2.0` | `+2.5` |
 | `productivity_growth_pct` | `1.0` | `2.1` | `0.5` | `1.4` |
@@ -94,12 +94,16 @@ Julkisyhteisöjen tulot `151,221 mrd. €`, menot `161,966 mrd. €`, alijääm�
 | `sote_cost_trend_adj_pct` | `+0.3` | `-0.4` | `+0.8` | `-0.8` |
 | `fixed_exp_adjustment_pct` | `0` | `-2` | `+3` | `-6` |
 | `base_interest_rate_pct` | `3.3` | `2.9` | `3.8` | `3.0` |
+| **2025 Lähtö (Velka/BKT \| Jäämä/BKT)** | `88,5 % \| -3,81 %` | `88,5 % \| -3,81 %` | `88,5 % \| -3,81 %` | `88,5 % \| -3,81 %` |
+| **2035 Mediaani (Velka/BKT \| Jäämä/BKT)** | `122,5 % \| -6,90 %` | `63,8 % \| +1,19 %` | `172,6 % \| -15,88 %` | `68,6 % \| +1,32 %` |
+| **2050 Mediaani (Velka/BKT \| Jäämä/BKT)** | `353,2 % \| -36,39 %` | `41,4 % \| +2,29 %` | `779,3 % \| -88,87 %` | `47,8 % \| +1,55 %` |
+| **Kriisitodennäköisyys & Status** | `100 % (velkakriisi)` | `0 % (kestävä)` | `100 % (velkakriisi)` | `0 % (kestävä)` |
 
 ---
 
 ## Osa 2: Laskentamallin toimintaperiaate ja kaavat
 
-Ennuste kattaa $T = 25$ vuotta ($t = 0, \dots, 24$, eli vuodet $2026 \dots 2050$). Koko laskenta ajetaan yhtenä `Float64Array`-taulukkopohjaisena ajona $N + 1 = 801$ polulla: polku $i = 0$ on deterministinen nollashokkipolku (käytetään myös väestökomponenttien ja maahanmuuttajaryhmien erittelyssä) ja polut $i = 1, \dots, N$ muodostavat Monte Carlo -jakauman.
+Ennuste kattaa $T = 25$ vuotta ($t = 0, \dots, 24$, eli vuodet $2026 \dots 2050$). Koko laskenta ajetaan yhtenä `Float64Array`-taulukkopohjaisena ajona $N + 1 = 801$ polulla: polku $i = 0$ on deterministinen nollashokkipolku (käytetään myös väestökomponenttien ja maahanmuuttajaryhmien elinkaarilaskennassa) ja polut $i = 1, \dots, N$ muodostavat Monte Carlo -jakauman.
 
 ### 2.1 Satunnaisluvut ja AR(1)-shokkiprosessit
 Jokaiselle neljästä stokastisesta tekijästä (tuottavuus, työllisyys, korko, nettomaahanmuutto) muodostetaan polkukohtainen autokorreloitu aikasarja siemenellä `random_seed = 42`:
@@ -120,44 +124,55 @@ $$a_{\text{rev}} = \frac{\text{Tulot}_{2025}}{\max(10^{-6},\,\text{modelRev25Raw
 ### 2.3 Väestö-, syntyvyys- ja maahanmuuttajakohortit
 Jokaisena vuonna $t$ ja polulla $i$:
 * **Syntyvyys ja `0–17 v` -putki:** Syntymät lasketaan kaavalla $\text{births} = P_{18\text{–}64}^{\text{pre}} \cdot \frac{0{,}258}{25} \cdot \text{TFR}$. 18 yksivuotista ikäluokkaa (`youthCohorts`) siirtyy vuodella eteenpäin kuolevuudella `0.0004`, ja 17-vuotiaat siirtyvät kantaväestön `18–64 v` -kantaan (`turn18`).
-* **Työikäisten siirtymät ja maahanmuutto:** Nettomaahanmuutto $\text{netMig} = \max(0,\,M_{\text{net}} + s_{i,t}^{\text{mig}})$ (missä $M_{\text{net}}$ on `annual_net_immigration`) jakautuu normalisoiduilla osuuksilla $(w_{\text{share}}, h_{\text{share}}, s_{\text{share}})$. Kantaväestöstä eläköityy $1/44{,}5$, työperäisistä $1/68{,}0$ ja humanitaarisista $1/72{,}0$ vuodessa (kuolevuus `0.0022`). Opiskelijoista valmistuu vuosittain $1/3{,}5$, ja osuus $\text{clip}(r_{\text{stay}},\ 0{,}05,\ 0{,}95)$ (missä $r_{\text{stay}} = \text{opiskelijoiden jäänti} / 100$, kenttä `student_stay_rate_pct`) siirtyy työperäiseen kantaan.
+* **Työikäisten siirtymät ja erillinen valmistuneiden opiskelijoiden allas (`popGradImm`):** Nettomaahanmuutto $\text{netMig} = \max(0,\,M_{\text{net}} + s_{i,t}^{\text{mig}})$ (missä $M_{\text{net}}$ on `annual_net_immigration`) jakautuu normalisoiduilla osuuksilla $(w_{\text{share}}, h_{\text{share}}, s_{\text{share}})$. Kantaväestöstä eläköityy $1/44{,}5$, työperäisistä (`popWorkImm`) ja valmistuneista maahan jääneistä opiskelijoista (`popGradImm`) $1/36{,}0$ ja humanitaarisista $1/38{,}0$ vuodessa (kuolevuus `0.0022`). Opiskelijoista valmistuu vuosittain $1/3{,}5$, ja osuus $\text{clip}(r_{\text{stay}},\ 0{,}05,\ 0{,}95)$ (kenttä `student_stay_rate_pct`) siirtyy suoraan omaan vektoriinsa `popGradImm[i]` pois `popWorkImm`-kannasta, mikä takaa täyden 1:1 yhdenmukaisuuden päämallin ja Välilehti 2:n välillä.
 * **Humanitaarisen ryhmän 11-portainen kotoutumisputki:** Kohorttisäiliöt `humBuckets[0..10]` kuvaavat maassaoloaikoja `0, 1, ..., 10+` vuotta. Uudet maahantulijat saapuvat säiliöön `0`, selviytyjät etenevät vuosittain oikealle (`survHum[k-1]`) ja `9 + 10+` kumuloituvat säiliöön `10`.
-* **Eläkeikäiset:** Eläköityneet siirtyvät ikäryhmään `65–74 v` (poistumana `10 %/v` ikääntyminen `75+`-ryhmään ja kuolevuus `0.014`). `75+`-ryhmän kuolevuus laskee lineaarisesti vuoden 2025 tasosta `0.064` vuoden 2050 tasoon `0.055`. Työikäisen kantaväestön ja eläkeryhmien alaraja on `100 000` hlö.
+* **Eläkeikäiset:** Eläköityneet (`totRet65 = retNat + retWork + retGrad + retHumSum`) siirtyvät ikäryhmään `65–74 v` (poistumana `10 %/v` ikääntyminen `75+`-ryhmään ja kuolevuus `0.014`). `75+`-ryhmän kuolevuus laskee lineaarisesti vuoden 2025 tasosta `0.064` vuoden 2050 tasoon `0.055`. Työikäisen kantaväestön ja eläkeryhmien alaraja on `100 000` hlö.
 
-### 2.4 Työllisyys, hintaindeksit ja BKT
-* **Politiikan siirtymäaika:** Työllisyysaste-, vero-, etuus- ja kiinteiden menojen politiikkamuutokset astuvat voimaan lineaarisesti 4 vuodessa: $\alpha_t = \min(1{,}0,\,(t+1)/4)$.
+### 2.4 Työllisyys, käyttäytymisvaikutukset, hintaindeksit ja BKT
+* **Politiikan siirtymäaika ja käyttäytymisjoustot:** Politiikkamuutokset astuvat voimaan 4 vuodessa ($\alpha_t = \min(1{,}0,\,(t+1)/4)$): tehokkaat ohjainmuutokset ovat $\Delta\tau_t = \alpha_t \cdot \text{tax}$, $\Delta b_t = \alpha_t \cdot \text{ben}$ ja $\Delta f_t = \alpha_t \cdot \text{fix}$. Työn tarjonnan joustovaikutus on:
+
+$$\Delta L_t = \frac{\Delta\tau_t \cdot \varepsilon_{\text{tax}} + \Delta b_t \cdot \varepsilon_{\text{ben}}}{100}, \qquad \varepsilon_{\text{tax}} = -0{,}22,\quad \varepsilon_{\text{ben}} = -0{,}06$$
+
 * **Ryhmäkohtaiset työllisyysasteet:**
-  * Kantaväestö: $\text{clip}(0{,}74 + \alpha_t \cdot \Delta e_{\text{nat}} + s_{i,t}^{\text{emp}},\ 0{,}45,\ 0{,}88)$
-  * Työperäiset: $\text{clip}(0{,}82 + 0{,}70 s_{i,t}^{\text{emp}},\ 0{,}50,\ 0{,}92)$
-  * Humanitaariset: $E_{\text{hum,base}} = \sum_{k=0}^{10} \text{humBuckets}_k \cdot \text{clip}(c_k \cdot v_{\text{int}},\ 0{,}05,\ 0{,}84)$, johon lisätään suhdanneshokki $\text{clip}(E_{\text{hum,base}} + 0{,}60 P_{\text{hum}} s_{i,t}^{\text{emp}},\ 0,\ 0{,}86 P_{\text{hum}})$
+  * Kantaväestö: $\text{clip}(0{,}74 + \alpha_t \cdot \Delta e_{\text{nat}} + \Delta L_t + s_{i,t}^{\text{emp}},\ 0{,}45,\ 0{,}88)$
+  * Työperäiset (`popWorkImm`) ja valmistuneet opiskelijat (`popGradImm`): $\text{clip}(0{,}82 + 0{,}7 \Delta L_t + 0{,}70 s_{i,t}^{\text{emp}},\ 0{,}50,\ 0{,}92)$ sekä $\text{clip}(0{,}78 + 0{,}7 \Delta L_t + 0{,}70 s_{i,t}^{\text{emp}},\ 0{,}50,\ 0{,}92)$ (keskipalkka `grad_student_avg_wage_eur = 41 000 €`).
+  * Humanitaariset: $E_{\text{hum,base}} = \sum_{k=0}^{10} \text{humBuckets}_k \cdot \text{clip}(c_k \cdot v_{\text{int}},\ 0{,}05,\ 0{,}84)$, johon lisätään jousto- ja suhdannevaikutus $\text{clip}(E_{\text{hum,base}} + P_{\text{hum}}(1{,}2 \Delta L_t + 0{,}60 s_{i,t}^{\text{emp}}),\ 0,\ 0{,}86 P_{\text{hum}})$
   * Opiskelijat: $\text{clip}(0{,}45 + 0{,}40 s_{i,t}^{\text{emp}},\ 0{,}15,\ 0{,}75)$ ja `65–74 v`: $\text{clip}(0{,}13 + 0{,}25 s_{i,t}^{\text{emp}},\ 0{,}05,\ 0{,}25)$.
-* **Indeksointi ja BKT:** Reaalituottavuus $p_{i,t} = \text{clip}(g_p + s_{i,t}^{\text{prod}},\ -0{,}05,\ 0{,}08)$ ja nimellinen ansiokehitys $g_{w} = (1+\pi)(1+p_{i,t}) - 1$. Eri menoerät indeksoituvat yhdistelmäpainoilla:
+* **Indeksointi (Baumolin tauti, vaimeneva sote-trendi ja elinaikakerroin):** Reaalituottavuus $p_{i,t} = \text{clip}(g_p + s_{i,t}^{\text{prod}},\ -0{,}05,\ 0{,}08)$ ja nimellinen ansiokehitys $g_{w} = (1+\pi)(1+p_{i,t}) - 1$:
   * Palkat (`cumProd`): $+ g_w$
   * Sosiaalietuudet (`cumSoc`): $+ 0{,}55\pi + 0{,}45 g_w$
-  * TyEL/eläkkeet (`cumTyel`): $+ 0{,}60\pi + 0{,}40 g_w$
-  * Sote & koulutus (`cumSote`): $\max(0{,}95,\ 1 + 0{,}45\pi + 0{,}55 g_w + \Delta_{\text{sote}})$
-  * Kiinteät menot (`cumFixed`): $+ 0{,}50\pi + 0{,}50 g_w$
+  * TyEL/eläkkeet (`cumTyel`): $+ 0{,}50\pi + 0{,}50 g_w$ (sekä kuolleisuuden alenemiseen sidottu **elinaikakerroin**: `longevityBrake` $= 1 - 0{,}45 \cdot \max(0,\,(0{,}064 - \text{mort75p})/0{,}064)$)
+  * Sote & koulutus (`cumSote`, Baumolin tauti): $\max(0{,}95,\ 1 + 0{,}18\pi + 0{,}82 g_w + w_{\text{sote},t} \Delta_{\text{sote}})$, missä tehostamistrendin paino $w_{\text{sote},t} = 1{,}0$ ensimmäiset 10 vuotta ($t < 10$) ja vaimenee sen jälkeen $\max(0{,}25,\,e^{-(t-9)/10})$.
+  * Kiinteät menot (`cumFixed`): $+ 0{,}25\pi + 0{,}75 g_w$ (+ väestönkasvujousto `popScaleFixed` $= \max(0{,}85,\ 1 + 0{,}30 \cdot \Delta P / P_{2025})$)
   * Pääoma- ja omaisuustulopohja (`cumAsset`): $+ \pi + 0{,}008$
-  * **Nimellinen BKT:** $\text{BKT}_{i,t} = \text{BKT}_{2025} \cdot \frac{\text{totWagesBn} / \text{cumProd}_i}{\text{baseWageBillBn}} \cdot \text{cumProd}_i$.
+* **Nimellinen BKT (pääomakannan `0,92`-jousto ja lyhyen aikavälin kysyntäkerroin):** Työpanoksen nopeassa muutoksessa pääomakanta ei sopeudu välittömästi 1:1 (`laborScale`), ja finanssipoliittinen kysyntäkerroin `demandShock` vaikuttaa ensimmäisen `6` vuoden aikana ($t < 6$) vaimeten kertoimella $e^{-t/4}$ (kerroin `0.45`):
 
-### 2.5 Julkiset menot, korkoriskipreemio, tulot ja velkalaki
-* **Menot:** Eläkkeet `expPen`, ikäpainotteinen sote & koulutus `expSote`, työikäisten kantaväestön ja maahanmuuttajien sosiaaliturva (`expNatSoc`, `expImmSoc` mukaan lukien `recentHum` 0–2 v kotoutumislisä, kerrottuna `benefitMult`:lla), kiinteät menot `expFixed` (`fixedMult`) sekä korkomenot `expInt`.
+$$\text{laborScale} = \left(\max\left(0{,}5,\ \frac{\text{realWagesBn}}{\text{baseWageBillBn}}\right)\right)^{0{,}92}, \qquad \text{BKT}_{i,t} = \text{BKT}_{2025} \cdot \text{laborScale} \cdot \text{cumProd}_i \cdot \text{demandShock}_t$$
+
+### 2.5 Julkiset menot, EDP-velan S1314/SFA-kiila, kassapuskuri ja verotulot
+* **Menot:** Eläkkeet `expPen` (kerrottuna `longevityBrake`:lla), ikäpainotteinen sote & koulutus `expSote`, työikäisten kantaväestön ja maahanmuuttajien sosiaaliturva (`expNatSoc`, `expImmSoc = expWorkSoc + expGradSoc + expHumSoc + expStudSoc`, mukaan lukien `recentHum` 0–2 v kotoutumislisä, kerrottuna `benefitMult`:lla), kiinteät menot `expFixed` (`fixedMult * popScaleFixed`) sekä korkomenot `expInt`.
 * **Velan jälleenrahoitus ja korkoriskipreemio:**
   * Ylitykset edellisen vuoden suhteista: $\text{excD} = \max(0,\,\frac{D_{t-1}}{\text{BKT}_t} - 0{,}90)$ ja $\text{excIR} = \max(0,\,\text{intRev}_{t-1} - 0{,}08)$.
   * Riskipreemio: $\text{rp} = \min(0{,}08,\ 0{,}075 \cdot \text{excD} + 0{,}18 \cdot \text{excIR})$.
   * Marginaalikorko $r_{\text{marg}} = \max(0{,}003,\ r_{\text{base}} + s_{i,t}^{\text{rate}} + \text{rp})$ ja velkakannan keskikorko $r_{\text{eff},t} = (1 - \frac{1}{7}) r_{\text{eff},t-1} + \frac{1}{7} r_{\text{marg}}$.
-* **Verotulot ja 18 % ALV-palautus (kaikki kerrottuna ankkurilla $a_{\text{rev}}$):**
-  * Veropolitiikkapotti: $\text{taxPolRev} = \alpha_t \Delta \tau_{\text{gdp}} \cdot \text{BKT}$, josta `55 %` kohdistuu palkkaveroihin, `30 %` kulutusveroihin ja `15 %` yritys-/pääomatuloihin.
-  * `revWage` (palkka- ja eläkeverot), `revCons` (nettopalkan kulutusvero + autonominen osuus BKT:sta), `revClaw = 0.18 * (expPen + expNatSoc + expImmSoc)` sekä `revCorp` (`0.075 * gdp` + `cumAsset`-komponentti).
-* **Velkakertymä ja kriisilippu:** $D_t = \max(0,\ D_{t-1} - (\text{totRev} - \text{totExp}))$. Kriisilippu `matCrisis = 1` asetetaan, jos velka/BKT `> 120 %` tai korkomenot/tulot `> 15 %`.
+* **Verotulot, lukukausimaksut ja 18 % ALV-palautus (ankkuroitu $a_{\text{rev}}$:llä):**
+  * Veropolitiikkapotti: $\text{taxPolRev} = \alpha_t \Delta \tau_{\text{gdp}} \cdot \text{BKT}$, josta `55 %` kohdistuu palkkaveroihin, `30 %` kulutusveroihin ja `15 %` yritys-/pääomatuloihin. Lisäksi työn verotuksen kiristys alentaa käytettävissä olevaa palkkaosuutta kulutusveroissa: `adjDisposableShare` $= \text{clip}(0{,}70 - 0{,}55 \cdot \Delta\tau_t/100,\ 0{,}50,\ 0{,}85)$.
+  * Aktiivisten opiskelijoiden (`popStudImm`) inflaatiokorjatut lukukausimaksutulot `tuitionRevBn` (`4 500 €/v * (1 + pi)^(t+1)`) lisätään suoraan päämallin tuloerään `revCorp` (`totRev`).
+  * `revWage` (palkka- ja eläkeverot), `revCons` (nettopalkan `adjDisposableShare` kulutusvero + autonominen osuus BKT:sta), `revClaw = 0.18 * (expPen + expNatSoc + expImmSoc)` sekä `revCorp` (`0.075 * gdp` + `cumAsset`-komponentti + `tuitionRevBn`).
+* **EDP-velkakertymä (S1314, SFA, rahoitusvarapuskuri ja 35 % pohja):** Työeläkerahastojen (`S1314`, `1,05 %` BKT) ylijäämä ei lyhennä EDP-bruttovelkaa ja tilinpidon ulkopuolinen SFA-erä (`0,35 %` BKT) kasvattaa sitä (`edpWedgeBn = (0.0105 + 0.0035) * gdp`). Kun julkinen talous on ylijäämäinen (`bal > 0`) ja edeltävä velkasuhde `< 60 %` (`prevDG < 0.60`), enintään `70 %` ylijäämästä (`bufferFrac = clip((0.60 - prevDG)/0.25, 0, 0.70)`) sijoitetaan rahoitusvaroihin suoran bruttovelan kuoletuksen sijaan, ja bruttovelalle asetetaan `35 %` BKT:n likviditeettipohja (`minGrossDebtBn = 0.35 * gdp`):
 
-### 2.6 Maahanmuuttoryhmien nettokassavirta (`i === 0`)
-Deterministisellä polulla lasketaan vuosittaiset tulo-, meno- ja nettovaikutusarvot ryhmille `work`, `humanitarian` ja `students`:
-* **Tulot (`gRev`):** Ryhmän palkkasummasta johdetut välittömät ja välilliset verot (`0.56 + 0.70*0.215 + 0.085`) veropolitiikkakertoimella `taxAdjMult` sekä `0.18` ALV-palautus ryhmän sosiaaliturvasta, kerrottuna $a_{\text{rev}}$.
-* **Menot (`gExp`):** Ryhmän sosiaaliturva- ja kotoutumismeno `gSoc` sekä palvelukustannus `gSote` (`4 200 €` indeksillä `cumSote` + `5 200 €` indeksillä `cumFixed` per henkilö).
+$$D_t = \max\big(0{,}35 \cdot \text{BKT}_{i,t},\ D_{t-1} - \text{bal}_{i,t}(1 - \text{bufferFrac}) + \text{edpWedgeBn}\big)$$
+
+Kriisilippu `matCrisis = 1` asetetaan, jos velka/BKT `> 120 %` tai korkomenot/tulot `> 15 %`.
+
+### 2.6 Maahanmuuttoryhmien elinkaarikassavirta (`i === 0`)
+Deterministisen ajon Välilehti 2 (`immRecords`) käyttää suoraan päämallin laskemia elinkaarivektoreita (`popWorkImm[0]`, `popStudImm[0] + popGradImm[0]`, `pHumTot`) ja `65+` eläkkeelle siirtyneitä altaita (`retPoolWork`, `retPoolHum`, `retPoolStud` jaetulla `65–74 v` / `75+ v` -ikärakenteella):
+* **Tulot (`gRev`):** Ryhmän palkkasummasta (`wWorkBn`, `wHumBn`, `wStudBn + wGradBn`) kertyvät välittömät ja kulutusverot (`adjDisposableShare`) kerrottuna `taxAdjMult`, **eläkkeiden tulovero (`22,5 %`)**, sosiaaliturvan & eläkkeiden **`18 %` ALV-palautus**, kerrottuna $a_{\text{rev}}$, sekä opiskelijaryhmässä samat päämallin `tuitionRevBn` -lukukausimaksutulot (`4 500 €/v`).
+* **Menot (`gExp`):** Päämallin sosiaaliturva-/kotoutumismenot (`expWorkSoc`, `expHumSoc`, `expStudSoc + expGradSoc`), eläkeläiskohorttien eläkemenot `gPenExp` (`32 280 € * cumTyel * longevityBrake`), ikäryhmittäiset sote- ja koulutusmenot (`4 200 / 8 800 / 24 500 € * cumSote`) sekä päämallin mukainen kiinteiden menojen rajakustannus (`0.30 * (fixed25AnchorBn * 1e9 / pop_total_2025)`, n. `2 751 €/v` indeksillä `cumFixed * fixedMult * popScaleFixed`).
 
 ### 2.7 Persentiilit, komponenttien tasapainotus ja kuukausimuunnos
-* **Jensenin epäyhtälön korjaus:** Koska epälineaarisen korkopreemion takia alaerialueiden mediaanien summa $\sum \text{median}(X_c) \neq \text{median}(\sum X_c)$, neljän tuloerän ja kuuden menoerän mediaanit skaalataan suhteellisesti täsmäämään kokonaistuloon `rev50` ja -menoon `exp50`.
+* **Monte Carlo -mediaanit:** Vuosiriveissä myös `eff_debt_rate_pct` ja `econ_dependency_ratio` lasketaan aitoina 800 polun `p50`-persentiileinä matriiseista `matEffRate` ja `matEconDep`. Epäsymmetristen jakaumien ja korkopreemion vuoksi erilliset mediaanit `revenue_p50 - expenditure_p50` voivat poiketa hieman erotuksen mediaanista `net_lending_p50` (huomautus `#tab3`-taulukon yllä ja `#tab4`-välilehdellä).
+* **Jensenin epäyhtälön korjaus:** Koska $\sum \text{median}(X_c) \neq \text{median}(\sum X_c)$, neljän tuloerän ja kuuden menoerän mediaanit skaalataan suhteellisesti täsmäämään kokonaistuloon `rev50` ja -menoon `exp50`.
 * **Kuukausi-interpolointi (384 kk):** Jokaiselle vuodelle lasketaan naapurivuosien avulla paikallinen kulmakerroin `slope = 0.5 * (yNext - yPrev)`, kerrotaan kuukausitrendi kausipainolla (`revSeasonal` / `expSeasonal`) ja normalisoidaan niin, että **kalenterivuoden 12 kuukauden summa on tarkasti yhtä suuri kuin vuosiarvo miljoonina euroina**. Kuukausijäämään lisätään deterministinen kausipoikkeama `(revSeas - revFlat) - (expSeas - expFlat)`, ja alaraja/yläraja varmistetaan suhteessa mediaaniin (`p05 <= p50 <= p95`).
 
 ---
