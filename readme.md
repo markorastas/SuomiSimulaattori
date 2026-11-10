@@ -52,11 +52,11 @@ Konfiguraatio sisältää kaiken laskennan lähtödatan ilman ulkoisia kutsuja:
 | Avain | Tyyppi | Rooli ja sisältö |
 | :--- | :--- | :--- |
 | `hist` | `Array<Object>` | Vuosien `2019–2025` (7 vuotta) toteutuneet tilasto- ja väestötietueet (StatFin `122g`, `15ah`, `15a9`, `11rs`, `13aj` ja THL Sotkanet `ind. 761`). |
-| `params` | `Object` | Mallin `47` rakenteellista kalibrointi- ja Monte Carlo -parametria (katso taulukko alla). |
+| `params` | `Object` | Mallin `50` rakenteellista kalibrointi- ja Monte Carlo -parametria (katso taulukko alla). |
 | `presets` | `Object` | Neljä valmista makrotaloudellista skenaariopohjaa (`Perusskenaario`, `Korkea työperäinen kasvu`, `Korkea humanitaarinen maahanmuutto`, `Tiukka menokuri`). |
 | `forecastYears` | `Array<number>` | Ennustevuosivektori `[2026, 2027, ..., 2050]` ($T = 25$). |
 | `subgroups2025` | `Object` | Vieraskielisen/ulkomaalaistaustaisen `18–64 v` lähtökannan jakauma vuonna 2025: `work_immigrants` (`248 000`), `humanitarian_immigrants` (`187 000`), `student_immigrants` (`42 643`). |
-| `humCurve` | `Array<number>` | 11-portainen humanitaarisen ryhmän työllisyyskäyrä maassaoloajan $k \in \{0, \dots, 10+\}$ mukaan: `[0.14, 0.24, 0.33, 0.40, 0.45, 0.49, 0.52, 0.55, 0.57, 0.59, 0.61]`. |
+| `humCurve` | `Array<number>` | 11-portainen humanitaarisen ryhmän työllisyyskäyrä maassaoloajan $k = 0, \dots, 10+$ mukaan: `[0.14, 0.24, 0.33, 0.40, 0.45, 0.49, 0.52, 0.55, 0.57, 0.59, 0.61]`. |
 | `humTenureShares` | `Array<number>` | Vuoden 2025 humanitaarisen kannan jakautuminen maassaolokohortteihin (`11` osuutta välillä `0.045–0.295`, summa `1.0`). |
 | `youthProfile` | `Array<number>` | `18` ikäluokan (`0–17 v`) lähtöprofiili skaalattavaksi vuoden 2025 `pop_0_17`-määrään. |
 | `revSeasonal` | `Array<number>` | `12` kuukauden kausipainot verotuloille (`tammikuu = 1.03`, ..., `joulukuu = 1.06`, keskiarvo `1.0`). |
@@ -116,7 +116,7 @@ $$a_{\text{rev}} = \frac{\text{Tulot}_{2025}}{\max(10^{-6},\,\text{modelRev25Raw
 ### 2.3 Väestö-, syntyvyys- ja maahanmuuttajakohortit
 Jokaisena vuonna $t$ ja polulla $i$:
 * **Syntyvyys ja `0–17 v` -putki:** Syntymät lasketaan kaavalla $\text{births} = P_{18\text{–}64}^{\text{pre}} \cdot \frac{0{,}258}{25} \cdot \text{TFR}$. 18 yksivuotista ikäluokkaa (`youthCohorts`) siirtyy vuodella eteenpäin kuolevuudella `0.0004`, ja 17-vuotiaat siirtyvät kantaväestön `18–64 v` -kantaan (`turn18`).
-* **Työikäisten siirtymät ja maahanmuutto:** Nettomaahanmuutto $\text{netMig} = \max(0,\,\text{annual\_net\_immigration} + s_{i,t}^{\text{mig}})$ jakautuu normalisoiduilla osuuksilla $(w_{\text{share}}, h_{\text{share}}, s_{\text{share}})$. Kantaväestöstä eläköityy $1/44{,}5$, työperäisistä $1/68{,}0$ ja humanitaarisista $1/72{,}0$ vuodessa (kuolevuus `0.0022`). Opiskelijoista valmistuu vuosittain $1/3{,}5$, ja osuus $\text{clip}(\text{student\_stay\_rate\_pct}/100,\ 0{,}05,\ 0{,}95)$ siirtyy työperäiseen kantaan.
+* **Työikäisten siirtymät ja maahanmuutto:** Nettomaahanmuutto $\text{netMig} = \max(0,\,M_{\text{net}} + s_{i,t}^{\text{mig}})$ (missä $M_{\text{net}}$ on `annual_net_immigration`) jakautuu normalisoiduilla osuuksilla $(w_{\text{share}}, h_{\text{share}}, s_{\text{share}})$. Kantaväestöstä eläköityy $1/44{,}5$, työperäisistä $1/68{,}0$ ja humanitaarisista $1/72{,}0$ vuodessa (kuolevuus `0.0022`). Opiskelijoista valmistuu vuosittain $1/3{,}5$, ja osuus $\text{clip}(r_{\text{stay}},\ 0{,}05,\ 0{,}95)$ (missä $r_{\text{stay}} = \text{opiskelijoiden jäänti} / 100$, kenttä `student_stay_rate_pct`) siirtyy työperäiseen kantaan.
 * **Humanitaarisen ryhmän 11-portainen kotoutumisputki:** Kohorttisäiliöt `humBuckets[0..10]` kuvaavat maassaoloaikoja `0, 1, ..., 10+` vuotta. Uudet maahantulijat saapuvat säiliöön `0`, selviytyjät etenevät vuosittain oikealle (`survHum[k-1]`) ja `9 + 10+` kumuloituvat säiliöön `10`.
 * **Eläkeikäiset:** Eläköityneet siirtyvät ikäryhmään `65–74 v` (poistumana `10 %/v` ikääntyminen `75+`-ryhmään ja kuolevuus `0.014`). `75+`-ryhmän kuolevuus laskee lineaarisesti vuoden 2025 tasosta `0.064` vuoden 2050 tasoon `0.055`. Työikäisen kantaväestön ja eläkeryhmien alaraja on `100 000` hlö.
 
