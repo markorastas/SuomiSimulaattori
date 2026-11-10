@@ -1,7 +1,7 @@
 # SuomiSimulaattori (`suomi_simulator.html`)
 
 > [!WARNING]
-> **Vastuuvapauslauseke / Disclaimer:** Tämä sovellus on **100 % vibekoodattu Gemini 3.8 Flash High -mallilla**, eikä esitettyjen lukujen, historiallisten poimintojen, parametrien tai ennusteiden oikeellisuudesta anneta **mitään takuita**. Sovellus on tarkoitettu ainoastaan havainnollistavaan ja kokeelliseen tarkasteluun, eikä sitä tule käyttää virallisen päätöksenteon tai taloudellisen neuvonnan perustana.
+> **Vastuuvapauslauseke / Disclaimer:** Tämä sovellus on toteutettu ihmisen ohjaamana tekoälyavusteisena ohjelmistokehityksenä, ja sen laskentamoottorin kaavat on teknisesti läpikäyty sekä kalibroitu iteratiivisesti julkisen talouden kestävyyslaskennan (VM, Suomen Pankki, ETK) periaatteita mukaillen. Kyseessä on täysin riippumaton, viranomaisiin liittymätön makrosimulaattori — ei virallinen viranomaislaskelma tai viranomaisten auditoima malli — eikä esitettyjen lukujen, historiallisten poimintojen, parametrien tai ennusteiden virheettömyydestä anneta takuita (`AS IS`). Sovellus on tarkoitettu havainnollistavaan, analyyttiseen ja kokeelliseen tarkasteluun, eikä sitä tule käyttää virallisen päätöksenteon tai taloudellisen neuvonnan perustana.
 
 👉 **[Avaa SuomiSimulaattori suoraan selaimessa](https://markorastas.github.io/SuomiSimulaattori/)** *(suora tiedostolinkki: https://markorastas.github.io/SuomiSimulaattori/suomi_simulator.html)*
 
