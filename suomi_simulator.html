@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SuomiSimulaattori — Julkisen talouden malli 2019–2050</title>
+<style>
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --text: #0f172a;
+  --muted: #475569;
+  --border: #e2e8f0;
+  --green: #16a34a;
+  --red: #dc2626;
+  --blue: #2563eb;
+  --purple: #6d28d9;
+  --amber: #d97706;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.45; }
+#no-js-banner {
+  background: #fef3c7; color: #92400e; border-bottom: 2px solid #f59e0b;
+  padding: 12px 16px; font-size: 0.95rem; font-weight: 600;
+}
+.layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 340px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border);
+  padding: 16px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0;
+}
+.main { flex: 1; min-width: 0; padding: 18px 22px 44px; max-width: 1360px; margin: 0 auto; }
+.mobile-ctrl-toggle { display: none; width: 100%; padding: 11px 14px; font-size: 0.96rem; font-weight: 600; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); cursor: pointer; margin-bottom: 12px; text-align: left; }
+h1 { font-size: 1.55rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 1.12rem; margin: 16px 0 8px; }
+h3 { font-size: 0.98rem; margin: 14px 0 6px; color: var(--text); }
+.subtitle { font-size: 0.86rem; color: var(--muted); margin-bottom: 14px; }
+.ctrl-group { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.ctrl-label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.84rem; font-weight: 500; margin-bottom: 4px; }
+.ctrl-val { font-weight: 700; color: var(--blue); white-space: nowrap; }
+input[type="range"] { width: 100%; accent-color: var(--blue); height: 22px; margin: 0 0 8px; cursor: pointer; }
+select, button.btn {
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 0.9rem;
+}
+button.btn { cursor: pointer; font-weight: 600; background: var(--surface-2); }
+button.btn:hover { background: #e2e8f0; }
+.radio-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.radio-pill {
+  flex: 1; text-align: center; padding: 7px 8px; font-size: 0.82rem; font-weight: 600;
+  border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--surface-2); user-select: none;
+}
+.radio-pill.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+.check-row { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; margin: 6px 0; cursor: pointer; }
+.caption { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+.verdict {
+  padding: 14px 16px; border-radius: 10px; border-left: 6px solid; margin-bottom: 14px;
+}
+.verdict.kestava { background: rgba(22,163,74,0.11); border-left-color: var(--green); }
+.verdict.naivettyminen { background: rgba(217,119,6,0.13); border-left-color: var(--amber); }
+.verdict.velkakriisi { background: rgba(220,38,38,0.13); border-left-color: var(--red); }
+.verdict-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+.verdict-meta { font-size: 0.83rem; margin-top: 8px; color: var(--text); opacity: 0.9; }
+.kpi-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.kpi-head { font-size: 0.86rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.kpi-items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.kpi-label { font-size: 0.75rem; color: var(--muted); }
+.kpi-num { font-size: 1.05rem; font-weight: 700; }
+.kpi-delta { font-size: 0.75rem; font-weight: 600; }
+.pos { color: var(--green); }
+.neg { color: var(--red); }
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
+.tab-btn {
+  padding: 8px 12px; border: 1px solid transparent; border-radius: 8px 8px 0 0; background: transparent;
+  font-size: 0.88rem; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.tab-btn.active { background: var(--surface); color: var(--blue); border-color: var(--border); border-bottom-color: var(--surface); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.chart-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+}
+.chart-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.chart-title { font-size: 0.96rem; font-weight: 700; }
+.chart-readout { font-size: 0.8rem; color: var(--text); background: var(--surface-2); padding: 4px 8px; border-radius: 6px; min-height: 24px; }
+.svg-wrap { width: 100%; touch-action: pan-y; position: relative; }
+.svg-wrap svg { width: 100%; height: auto; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 8px; font-size: 0.78rem; color: var(--muted); }
+.legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.table-wrap { max-height: 380px; overflow: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+thead th { position: sticky; top: 0; background: var(--surface-2); font-weight: 700; z-index: 1; }
+.meth-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-size: 0.9rem; }
+@media (max-width: 960px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; max-height: none; position: static; border-right: none; border-bottom: 1px solid var(--border); display: none; }
+  .sidebar.open { display: block; }
+  .mobile-ctrl-toggle { display: block; }
+  .main { padding: 12px 12px 32px; }
+  h1 { font-size: 1.25rem; }
+  .kpi-grid, .grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="no-js-banner">⚠️ Tiedosto avattiin esikatselutilassa ilman JavaScriptiä. Jos käytät iPhonea tai WhatsAppia, valitse <b>Jaa / Lisää → Avaa selaimessa (Safari / Chrome)</b>.</div>
+
+<div class="layout">
+  <aside id="sidebar" class="sidebar"></aside>
+  <main class="main">
+    <button id="mobile-toggle" class="mobile-ctrl-toggle" type="button">⚙️ Skenaario ja parametrit (avaa / sulje)</button>
+    <h1>Suomen julkisen talouden simulointimalli (2019–2050)</h1>
+    <div id="app-subtitle" class="subtitle"></div>
+    <div id="verdict-box" class="verdict"></div>
+    <h2 id="kpi-heading">Keskeiset tunnusluvut</h2>
+    <div id="kpi-grid" class="kpi-grid"></div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab1">📈 Pääkäyrät</button>
+      <button class="tab-btn" data-tab="tab2">🧩 Erittely &amp; maahanmuutto</button>
+      <button class="tab-btn" data-tab="tab3">⚖️ Velka, väestö &amp; data</button>
+      <button class="tab-btn" data-tab="tab4">📘 Metodologia</button>
+    </div>
+    <section id="tab1" class="tab-panel active"></section>
+    <section id="tab2" class="tab-panel"></section>
+    <section id="tab3" class="tab-panel"></section>
+    <section id="tab4" class="tab-panel"></section>
+  </main>
+</div>
+
+<script id="sim-config" type="application/json">{"hist": [{"year": 2019, "total_revenue_meur": 123231.0, "total_expenditure_meur": 125459.0, "net_lending_meur": -2228.0, "net_lending_gdp_pct": -0.93, "edp_debt_meur": 155819.0, "edp_debt_gdp_pct": 65.33, "nominal_gdp_meur": 238518.0, "interest_exp_meur": 2033.0, "property_interest_rev_meur": 1702.0, "direct_taxes_d5r_meur": 36488.0, "indirect_taxes_d2r_meur": 35504.0, "social_contributions_d61r_meur": 28541.0, "cash_social_benefits_d62k_meur": 43610.0, "consumption_exp_p3k_meur": 56004.0, "pensions_exp_meur": 33950.0, "sote_edu_exp_meur": 39150.0, "native_social_exp_meur": 7680.0, "immigrant_social_exp_meur": 1520.0, "employed_15_64_k": 2455.0, "employed_15_74_k": 2533.0, "emp_rate_15_64_pct": 71.6, "emp_rate_15_74_pct": 61.4, "pop_total": 5525292, "pop_0_17": 1049057, "pop_18_64": 3244961, "pop_65_74": 706691, "pop_75_plus": 524583, "pop_finnish_bg_total": 5101798, "pop_foreign_bg_total": 423494, "pop_finnish_bg_18_64": 2940695, "pop_foreign_bg_18_64": 304266, "pop_finnish_bg_0_17": 953201, "pop_foreign_bg_0_17": 95856, "pop_finnish_bg_65_74": 691392, "pop_foreign_bg_65_74": 15299, "pop_finnish_bg_75_plus": 516510, "pop_foreign_bg_75_plus": 8073, "sotkanet_demo_dep_ratio": 61.4, "total_revenue_bn": 123.231, "total_expenditure_bn": 125.459, "net_lending_bn": -2.228, "edp_debt_bn": 155.819, "nominal_gdp_bn": 238.518, "rev_wage_pension_taxes_bn": 59.555800000000005, "rev_consumption_taxes_bn": 27.737, "rev_social_clawback_bn": 7.767, "rev_corp_capital_property_bn": 28.171199999999995, "exp_pensions_bn": 33.95, "exp_sote_edu_bn": 39.15, "exp_native_social_bn": 7.68, "exp_immigrant_social_bn": 1.52, "exp_fixed_other_bn": 41.126, "exp_interest_bn": 2.033, "demo_dependency_ratio": 70.27, "econ_dependency_ratio": 118.13, "interest_to_revenue_pct": 1.65, "is_historical": true}, {"year": 2020, "total_revenue_meur": 120365.0, "total_expenditure_meur": 133447.0, "net_lending_meur": -13082.0, "net_lending_gdp_pct": -5.53, "edp_debt_meur": 178040.0, "edp_debt_gdp_pct": 75.32, "nominal_gdp_meur": 236387.0, "interest_exp_meur": 1584.0, "property_interest_rev_meur": 1415.0, "direct_taxes_d5r_meur": 36017.0, "indirect_taxes_d2r_meur": 35061.0, "social_contributions_d61r_meur": 27561.0, "cash_social_benefits_d62k_meur": 46296.0, "consumption_exp_p3k_meur": 57768.0, "pensions_exp_meur": 35150.0, "sote_edu_exp_meur": 41100.0, "native_social_exp_meur": 9350.0, "immigrant_social_exp_meur": 1780.0, "employed_15_64_k": 2420.0, "employed_15_74_k": 2495.0, "emp_rate_15_64_pct": 70.7, "emp_rate_15_74_pct": 60.4, "pop_total": 5533793, "pop_0_17": 1041526, "pop_18_64": 3236329, "pop_65_74": 708103, "pop_75_plus": 547835, "pop_finnish_bg_total": 5089762, "pop_foreign_bg_total": 444031, "pop_finnish_bg_18_64": 2918129, "pop_foreign_bg_18_64": 318200, "pop_finnish_bg_0_17": 940773, "pop_foreign_bg_0_17": 100753, "pop_finnish_bg_65_74": 691580, "pop_foreign_bg_65_74": 16523, "pop_finnish_bg_75_plus": 539280, "pop_foreign_bg_75_plus": 8555, "sotkanet_demo_dep_ratio": 61.9, "total_revenue_bn": 120.365, "total_expenditure_bn": 133.447, "net_lending_bn": -13.082, "edp_debt_bn": 178.04, "nominal_gdp_bn": 236.387, "rev_wage_pension_taxes_bn": 58.17545, "rev_consumption_taxes_bn": 26.7306, "rev_social_clawback_bn": 8.3304, "rev_corp_capital_property_bn": 27.12855000000002, "exp_pensions_bn": 35.15, "exp_sote_edu_bn": 41.1, "exp_native_social_bn": 9.35, "exp_immigrant_social_bn": 1.78, "exp_fixed_other_bn": 44.483, "exp_interest_bn": 1.584, "demo_dependency_ratio": 70.99, "econ_dependency_ratio": 121.8, "interest_to_revenue_pct": 1.32, "is_historical": true}, {"year": 2021, "total_revenue_meur": 130505.0, "total_expenditure_meur": 137103.0, "net_lending_meur": -6598.0, "net_lending_gdp_pct": -2.65, "edp_debt_meur": 181911.0, "edp_debt_gdp_pct": 73.13, "nominal_gdp_meur": 248764.0, "interest_exp_meur": 1265.0, "property_interest_rev_meur": 1385.0, "direct_taxes_d5r_meur": 40178.0, "indirect_taxes_d2r_meur": 36649.0, "social_contributions_d61r_meur": 30447.0, "cash_social_benefits_d62k_meur": 46602.0, "consumption_exp_p3k_meur": 61708.0, "pensions_exp_meur": 36050.0, "sote_edu_exp_meur": 42950.0, "native_social_exp_meur": 8900.0, "immigrant_social_exp_meur": 1860.0, "employed_15_64_k": 2470.0, "employed_15_74_k": 2555.0, "emp_rate_15_64_pct": 72.3, "emp_rate_15_74_pct": 62.0, "pop_total": 5548241, "pop_0_17": 1035517, "pop_18_64": 3233688, "pop_65_74": 702981, "pop_75_plus": 576055, "pop_finnish_bg_total": 5078608, "pop_foreign_bg_total": 469633, "pop_finnish_bg_18_64": 2895917, "pop_foreign_bg_18_64": 337771, "pop_finnish_bg_0_17": 930438, "pop_foreign_bg_0_17": 105079, "pop_finnish_bg_65_74": 685155, "pop_foreign_bg_65_74": 17826, "pop_finnish_bg_75_plus": 567098, "pop_foreign_bg_75_plus": 8957, "sotkanet_demo_dep_ratio": 62.4, "total_revenue_bn": 130.505, "total_expenditure_bn": 137.103, "net_lending_bn": -6.598, "edp_debt_bn": 181.911, "nominal_gdp_bn": 248.764, "rev_wage_pension_taxes_bn": 64.5983, "rev_consumption_taxes_bn": 28.223200000000002, "rev_social_clawback_bn": 8.425799999999999, "rev_corp_capital_property_bn": 29.257699999999996, "exp_pensions_bn": 36.05, "exp_sote_edu_bn": 42.95, "exp_native_social_bn": 8.9, "exp_immigrant_social_bn": 1.86, "exp_fixed_other_bn": 46.078, "exp_interest_bn": 1.265, "demo_dependency_ratio": 71.58, "econ_dependency_ratio": 117.15, "interest_to_revenue_pct": 0.97, "is_historical": true}, {"year": 2022, "total_revenue_meur": 139608.0, "total_expenditure_meur": 140085.0, "net_lending_meur": -477.0, "net_lending_gdp_pct": -0.18, "edp_debt_meur": 196844.0, "edp_debt_gdp_pct": 74.09, "nominal_gdp_meur": 265669.0, "interest_exp_meur": 1497.0, "property_interest_rev_meur": 1632.0, "direct_taxes_d5r_meur": 43677.0, "indirect_taxes_d2r_meur": 38426.0, "social_contributions_d61r_meur": 32200.0, "cash_social_benefits_d62k_meur": 47022.0, "consumption_exp_p3k_meur": 64318.0, "pensions_exp_meur": 37280.0, "sote_edu_exp_meur": 44500.0, "native_social_exp_meur": 8100.0, "immigrant_social_exp_meur": 2050.0, "employed_15_64_k": 2526.0, "employed_15_74_k": 2619.0, "emp_rate_15_64_pct": 73.8, "emp_rate_15_74_pct": 63.6, "pop_total": 5563970, "pop_0_17": 1026192, "pop_18_64": 3243267, "pop_65_74": 693661, "pop_75_plus": 600850, "pop_finnish_bg_total": 5055797, "pop_foreign_bg_total": 508173, "pop_finnish_bg_18_64": 2875824, "pop_foreign_bg_18_64": 367443, "pop_finnish_bg_0_17": 914095, "pop_foreign_bg_0_17": 112097, "pop_finnish_bg_65_74": 674604, "pop_foreign_bg_65_74": 19057, "pop_finnish_bg_75_plus": 591274, "pop_foreign_bg_75_plus": 9576, "sotkanet_demo_dep_ratio": 62.3, "total_revenue_bn": 139.608, "total_expenditure_bn": 140.085, "net_lending_bn": -0.477, "edp_debt_bn": 196.844, "nominal_gdp_bn": 265.669, "rev_wage_pension_taxes_bn": 69.32545, "rev_consumption_taxes_bn": 29.8886, "rev_social_clawback_bn": 8.5374, "rev_corp_capital_property_bn": 31.856550000000016, "exp_pensions_bn": 37.28, "exp_sote_edu_bn": 44.5, "exp_native_social_bn": 8.1, "exp_immigrant_social_bn": 2.05, "exp_fixed_other_bn": 46.658, "exp_interest_bn": 1.497, "demo_dependency_ratio": 71.55, "econ_dependency_ratio": 112.45, "interest_to_revenue_pct": 1.07, "is_historical": true}, {"year": 2023, "total_revenue_meur": 144809.0, "total_expenditure_meur": 152878.0, "net_lending_meur": -8069.0, "net_lending_gdp_pct": -2.96, "edp_debt_meur": 210542.0, "edp_debt_gdp_pct": 77.2, "nominal_gdp_meur": 272735.0, "interest_exp_meur": 3173.0, "property_interest_rev_meur": 3497.0, "direct_taxes_d5r_meur": 43563.0, "indirect_taxes_d2r_meur": 37572.0, "social_contributions_d61r_meur": 34143.0, "cash_social_benefits_d62k_meur": 50062.0, "consumption_exp_p3k_meur": 70130.0, "pensions_exp_meur": 41250.0, "sote_edu_exp_meur": 47600.0, "native_social_exp_meur": 8380.0, "immigrant_social_exp_meur": 2350.0, "employed_15_64_k": 2532.0, "employed_15_74_k": 2628.0, "emp_rate_15_64_pct": 73.6, "emp_rate_15_74_pct": 63.6, "pop_total": 5603851, "pop_0_17": 1022205, "pop_18_64": 3272270, "pop_65_74": 682733, "pop_75_plus": 626643, "pop_finnish_bg_total": 5032583, "pop_foreign_bg_total": 571268, "pop_finnish_bg_18_64": 2858884, "pop_foreign_bg_18_64": 413386, "pop_finnish_bg_0_17": 895959, "pop_foreign_bg_0_17": 126246, "pop_finnish_bg_65_74": 661437, "pop_foreign_bg_65_74": 21296, "pop_finnish_bg_75_plus": 616303, "pop_foreign_bg_75_plus": 10340, "sotkanet_demo_dep_ratio": 61.9, "total_revenue_bn": 144.809, "total_expenditure_bn": 152.878, "net_lending_bn": -8.069, "edp_debt_bn": 210.542, "nominal_gdp_bn": 272.735, "rev_wage_pension_taxes_bn": 71.17154999999998, "rev_consumption_taxes_bn": 28.2156, "rev_social_clawback_bn": 9.356399999999999, "rev_corp_capital_property_bn": 36.06545000000001, "exp_pensions_bn": 41.25, "exp_sote_edu_bn": 47.6, "exp_native_social_bn": 8.38, "exp_immigrant_social_bn": 2.35, "exp_fixed_other_bn": 50.125, "exp_interest_bn": 3.173, "demo_dependency_ratio": 71.25, "econ_dependency_ratio": 113.24, "interest_to_revenue_pct": 2.19, "is_historical": true}, {"year": 2024, "total_revenue_meur": 147513.0, "total_expenditure_meur": 159790.0, "net_lending_meur": -12277.0, "net_lending_gdp_pct": -4.45, "edp_debt_meur": 227752.0, "edp_debt_gdp_pct": 82.47, "nominal_gdp_meur": 276151.0, "interest_exp_meur": 4340.0, "property_interest_rev_meur": 4157.0, "direct_taxes_d5r_meur": 44129.0, "indirect_taxes_d2r_meur": 38500.0, "social_contributions_d61r_meur": 32728.0, "cash_social_benefits_d62k_meur": 52784.0, "consumption_exp_p3k_meur": 71759.0, "pensions_exp_meur": 42850.0, "sote_edu_exp_meur": 49150.0, "native_social_exp_meur": 8960.0, "immigrant_social_exp_meur": 2610.0, "employed_15_64_k": 2504.0, "employed_15_74_k": 2602.0, "emp_rate_15_64_pct": 72.1, "emp_rate_15_74_pct": 62.7, "pop_total": 5635971, "pop_0_17": 1013268, "pop_18_64": 3293886, "pop_65_74": 675986, "pop_75_plus": 652831, "pop_finnish_bg_total": 5012022, "pop_foreign_bg_total": 623949, "pop_finnish_bg_18_64": 2841539, "pop_foreign_bg_18_64": 452347, "pop_finnish_bg_0_17": 876411, "pop_foreign_bg_0_17": 136857, "pop_finnish_bg_65_74": 652623, "pop_foreign_bg_65_74": 23363, "pop_finnish_bg_75_plus": 641449, "pop_foreign_bg_75_plus": 11382, "sotkanet_demo_dep_ratio": 61.6, "total_revenue_bn": 147.513, "total_expenditure_bn": 159.79, "net_lending_bn": -12.277, "edp_debt_bn": 227.752, "nominal_gdp_bn": 276.151, "rev_wage_pension_taxes_bn": 70.23764999999999, "rev_consumption_taxes_bn": 28.7044, "rev_social_clawback_bn": 9.7956, "rev_corp_capital_property_bn": 38.77535, "exp_pensions_bn": 42.85, "exp_sote_edu_bn": 49.15, "exp_native_social_bn": 8.96, "exp_immigrant_social_bn": 2.61, "exp_fixed_other_bn": 51.88, "exp_interest_bn": 4.34, "demo_dependency_ratio": 71.1, "econ_dependency_ratio": 116.6, "interest_to_revenue_pct": 2.94, "is_historical": true}, {"year": 2025, "total_revenue_meur": 151221.0, "total_expenditure_meur": 161966.0, "net_lending_meur": -10745.0, "net_lending_gdp_pct": -3.81, "edp_debt_meur": 249225.0, "edp_debt_gdp_pct": 88.45, "nominal_gdp_meur": 281783.0, "interest_exp_meur": 4559.0, "property_interest_rev_meur": 3665.0, "direct_taxes_d5r_meur": 44718.0, "indirect_taxes_d2r_meur": 39540.0, "social_contributions_d61r_meur": 34120.0, "cash_social_benefits_d62k_meur": 53140.0, "consumption_exp_p3k_meur": 72820.0, "pensions_exp_meur": 43500.0, "sote_edu_exp_meur": 50190.0, "native_social_exp_meur": 9180.0, "immigrant_social_exp_meur": 2700.0, "employed_15_64_k": 2495.0, "employed_15_74_k": 2590.0, "emp_rate_15_64_pct": 71.4, "emp_rate_15_74_pct": 62.2, "pop_total": 5652881, "pop_0_17": 1004036, "pop_18_64": 3301351, "pop_65_74": 672046, "pop_75_plus": 675448, "pop_finnish_bg_total": 4992081, "pop_foreign_bg_total": 660800, "pop_finnish_bg_18_64": 2823708, "pop_foreign_bg_18_64": 477643, "pop_finnish_bg_0_17": 858862, "pop_foreign_bg_0_17": 145174, "pop_finnish_bg_65_74": 646409, "pop_foreign_bg_65_74": 25637, "pop_finnish_bg_75_plus": 663102, "pop_foreign_bg_75_plus": 12346, "sotkanet_demo_dep_ratio": 61.6, "total_revenue_bn": 151.221, "total_expenditure_bn": 161.966, "net_lending_bn": -10.745, "edp_debt_bn": 249.225, "nominal_gdp_bn": 281.783, "rev_wage_pension_taxes_bn": 72.13029999999999, "rev_consumption_taxes_bn": 29.5716, "rev_social_clawback_bn": 9.968399999999999, "rev_corp_capital_property_bn": 39.55070000000001, "exp_pensions_bn": 43.5, "exp_sote_edu_bn": 50.19, "exp_native_social_bn": 9.18, "exp_immigrant_social_bn": 2.7, "exp_fixed_other_bn": 51.837, "exp_interest_bn": 4.559, "demo_dependency_ratio": 71.23, "econ_dependency_ratio": 118.26, "interest_to_revenue_pct": 3.01, "is_historical": true}], "params": {"inflation_rate": 0.02, "native_base_employment_rate": 0.74, "work_imm_employment_rate": 0.82, "student_employment_rate": 0.45, "elderly_65_74_employment_rate": 0.13, "native_avg_wage_eur": 46000.0, "work_imm_avg_wage_eur": 44500.0, "humanitarian_avg_wage_eur": 33000.0, "student_avg_wage_eur": 22000.0, "elderly_65_74_avg_wage_eur": 32000.0, "effective_wage_tax_soc_rate": 0.56, "pension_income_tax_rate": 0.225, "net_disposable_wage_share": 0.7, "consumption_tax_rate": 0.215, "autonomous_indirect_tax_gdp_share": 0.0445, "social_clawback_rate": 0.18, "corp_capital_property_gdp_share": 0.1413, "native_social_cost_per_non_emp_eur": 12500.0, "work_imm_social_cost_per_non_emp_eur": 9800.0, "humanitarian_social_cost_per_non_emp_eur": 19000.0, "humanitarian_integration_cost_per_recent_eur": 6500.0, "student_social_cost_per_non_emp_eur": 2800.0, "sote_edu_cost_0_17_eur": 13800.0, "sote_edu_cost_18_64_eur": 4200.0, "sote_edu_cost_65_74_eur": 8800.0, "sote_edu_cost_75_plus_eur": 24500.0, "pension_cost_per_65_plus_eur": 32280.0, "base_2025_fixed_exp_bn": 51.837, "avg_study_duration_years": 3.5, "mortality_rate_0_17": 0.0004, "mortality_rate_18_64": 0.0022, "mortality_rate_65_74": 0.014, "mortality_rate_75_plus_2025": 0.064, "mortality_rate_75_plus_2050": 0.055, "base_2025_effective_debt_rate": 0.0183, "debt_rollover_years": 7.0, "risk_premium_debt_threshold": 0.9, "risk_premium_interest_rev_threshold": 0.08, "crisis_debt_threshold": 1.2, "crisis_interest_rev_threshold": 0.15, "n_simulations": 800, "random_seed": 42, "mc_productivity_phi": 0.45, "mc_productivity_sigma": 0.011, "mc_employment_phi": 0.65, "mc_employment_sigma": 0.018, "mc_interest_phi": 0.75, "mc_interest_sigma": 0.0085, "mc_migration_phi": 0.6, "mc_migration_sigma": 6500.0}, "presets": {"Perusskenaario (Nykyinen kehitys jatkuu)": {"description": "Suomi jatkaa nykyisellä rakenteellisella uralla: maltillinen 1,0 % tuottavuuskasvu, noin 30 000 hengen nettomaahanmuutto, 1,30 syntyvyys ja sote-menojen väestöpaine. Velkasuhde ylittää 90 % riskikynnyksen välittömästi ja jatkaa hidasta nousua.", "native_emp_change_pp": 0.0, "productivity_growth_pct": 1.0, "annual_net_immigration": 30000, "work_imm_share_pct": 48.0, "humanitarian_imm_share_pct": 35.0, "student_imm_share_pct": 17.0, "humanitarian_integration_speed": 1.0, "student_stay_rate_pct": 58.0, "total_fertility_rate": 1.3, "tax_rate_change_pp": 0.0, "social_benefit_change_pct": 0.0, "sote_cost_trend_adj_pct": 0.3, "fixed_exp_adjustment_pct": 0.0, "base_interest_rate_pct": 3.3}, "Korkea työperäinen kasvu ja tuottavuusloikka": {"description": "T&K-investoinnit, osaajamaahanmuutto (42 000 hlö/v, 68 % työperäistä), korkeampi opiskelijoiden maahanjäänti ja vahva 2,1 % tuottavuuskasvu kääntävät julkisen talouden ylijäämäiseksi ja velkasuhteen kestävään laskuun.", "native_emp_change_pp": 3.5, "productivity_growth_pct": 2.1, "annual_net_immigration": 42000, "work_imm_share_pct": 68.0, "humanitarian_imm_share_pct": 14.0, "student_imm_share_pct": 18.0, "humanitarian_integration_speed": 1.25, "student_stay_rate_pct": 72.0, "total_fertility_rate": 1.45, "tax_rate_change_pp": 0.0, "social_benefit_change_pct": -2.0, "sote_cost_trend_adj_pct": -0.4, "fixed_exp_adjustment_pct": -2.0, "base_interest_rate_pct": 2.9}, "Korkea humanitaarinen maahanmuutto ja heikko työllisyys": {"description": "Maahanmuutto painottuu voimakkaasti humanitaariseen ja perheperusteiseen muuttoon (66 %), samalla kun tuottavuus matelee (0,5 %) ja työllisyys heikkenee. Sosiaaliturva-, kotoutumis- ja korkomenot laukaisevat velkakierteen.", "native_emp_change_pp": -2.0, "productivity_growth_pct": 0.5, "annual_net_immigration": 45000, "work_imm_share_pct": 22.0, "humanitarian_imm_share_pct": 66.0, "student_imm_share_pct": 12.0, "humanitarian_integration_speed": 0.85, "student_stay_rate_pct": 42.0, "total_fertility_rate": 1.25, "tax_rate_change_pp": 0.5, "social_benefit_change_pct": 4.0, "sote_cost_trend_adj_pct": 0.8, "fixed_exp_adjustment_pct": 3.0, "base_interest_rate_pct": 3.8}, "Tiukka menokuri ja rakenteelliset uudistukset": {"description": "Kattava sopeutusohjelma: sosiaaliturvan ja kiinteiden menojen leikkaukset, sote-tuottavuusuudistus (-0,8 %/v), maltillinen veronkiristys (+0,5 %-yks.) sekä työllisyysasteen nosto (+2,5 %-yks.) taittavat velkaantumisen nopeasti.", "native_emp_change_pp": 2.5, "productivity_growth_pct": 1.4, "annual_net_immigration": 28000, "work_imm_share_pct": 58.0, "humanitarian_imm_share_pct": 24.0, "student_imm_share_pct": 18.0, "humanitarian_integration_speed": 1.2, "student_stay_rate_pct": 65.0, "total_fertility_rate": 1.35, "tax_rate_change_pp": 0.5, "social_benefit_change_pct": -8.0, "sote_cost_trend_adj_pct": -0.8, "fixed_exp_adjustment_pct": -6.0, "base_interest_rate_pct": 3.0}}, "forecastYears": [2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050], "subgroups2025": {"work_immigrants": 248000, "humanitarian_immigrants": 187000, "student_immigrants": 42643}, "humCurve": [0.14, 0.24, 0.33, 0.4, 0.45, 0.49, 0.52, 0.55, 0.57, 0.59, 0.61], "humTenureShares": [0.095, 0.105, 0.115, 0.095, 0.055, 0.045, 0.045, 0.045, 0.05, 0.055, 0.295], "youthProfile": [43500.0, 44944.68, 46389.36, 47834.04, 49278.72, 50723.4, 52168.08, 53612.759999999995, 55057.44, 56502.119999999995, 57946.8, 59391.479999999996, 60836.159999999996, 62280.84, 63725.52, 65170.2, 66614.88, 68059.56], "revSeasonal": [1.03, 0.95, 1.04, 0.98, 1.01, 1.07, 0.96, 0.92, 0.95, 0.97, 1.06, 1.06], "expSeasonal": [0.96, 0.95, 1.0, 0.98, 1.01, 1.08, 0.95, 0.96, 0.98, 0.99, 1.03, 1.11], "sourceStatus": {"statfin_talous": "Live API (StatFin 122g, 15ah, 15a9)", "statfin_vaesto": "Live API (StatFin 11rs)", "statfin_tyollisyys": "Live API (StatFin 13aj)", "thl_sotkanet": "Live API (THL Sotkanet ind. 761)"}, "updatedAt": "2026-11-10 18:19:41 UTC"}</script>
+
+<script id="sim-engine">
+(function (root) {
+  function normalizedMigrationShares(inputs) {
+    const w = Math.max(0.0, Number(inputs.work_imm_share_pct) || 0);
+    const h = Math.max(0.0, Number(inputs.humanitarian_imm_share_pct) || 0);
+    const s = Math.max(0.0, Number(inputs.student_imm_share_pct) || 0);
+    const tot = w + h + s;
+    if (tot <= 0) return [0.5, 0.35, 0.15];
+    return [w / tot, h / tot, s / tot];
+  }
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function makeGaussianRng(seed) {
+    const u = mulberry32(seed);
+    let spare = null;
+    return function randn() {
+      if (spare !== null) {
+        const val = spare;
+        spare = null;
+        return val;
+      }
+      let u1 = 0;
+      while (u1 <= 1e-12) u1 = u();
+      const u2 = u();
+      const mag = Math.sqrt(-2.0 * Math.log(u1));
+      spare = mag * Math.sin(2.0 * Math.PI * u2);
+      return mag * Math.cos(2.0 * Math.PI * u2);
+    };
+  }
+
+  function generateAr1Shocks(randn, nSim, nSteps, phi, sigma) {
+    const nTotal = nSim + 1;
+    const out = new Float64Array(nTotal * nSteps);
+    if (nSim <= 0 || sigma <= 0) return out;
+    const innovStd = sigma * Math.sqrt(Math.max(1e-9, 1.0 - phi * phi));
+    for (let i = 1; i < nTotal; i++) {
+      let state = randn() * sigma * 0.5;
+      for (let t = 0; t < nSteps; t++) {
+        state = phi * state + randn() * innovStd;
+        out[i * nSteps + t] = state;
+      }
+    }
+    return out;
+  }
+
+  function percentileLinear(arr, q) {
+    const sorted = Array.from(arr).sort((a, b) => a - b);
+    const n = sorted.length;
+    if (n === 0) return 0;
+    if (n === 1) return sorted[0];
+    const pos = (q / 100.0) * (n - 1);
+    const lo = Math.floor(pos);
+    const hi = Math.ceil(pos);
+    const frac = pos - lo;
+    return sorted[lo] * (1.0 - frac) + sorted[hi] * frac;
+  }
+
+  function interpolateAnnualToMonthlyFlow(annualValsBn, seasonalWeights) {
+    const nYears = annualValsBn.length;
+    const out = new Float64Array(nYears * 12);
+    let weights = new Array(12).fill(1.0);
+    if (seasonalWeights && seasonalWeights.length === 12) {
+      const meanW = seasonalWeights.reduce((a, b) => a + b, 0) / 12.0;
+      weights = seasonalWeights.map((v) => v / meanW);
+    }
+    for (let idx = 0; idx < nYears; idx++) {
+      const yCurr = Number(annualValsBn[idx]) * 1000.0;
+      const yPrev = idx > 0 ? Number(annualValsBn[idx - 1]) * 1000.0 : yCurr;
+      const yNext = idx < nYears - 1 ? Number(annualValsBn[idx + 1]) * 1000.0 : yCurr;
+      const slope = 0.5 * (yNext - yPrev);
+      const raw12 = new Float64Array(12);
+      let rawSum = 0;
+      for (let m = 0; m < 12; m++) {
+        const pos = (m - 5.5) / 12.0;
+        let trend = yCurr / 12.0 + (slope / 12.0) * pos;
+        if (yCurr >= 0) trend = Math.max(0.0, trend);
+        const val = trend * weights[m];
+        raw12[m] = val;
+        rawSum += val;
+      }
+      for (let m = 0; m < 12; m++) {
+        out[idx * 12 + m] = Math.abs(rawSum) > 1e-9 ? raw12[m] * (yCurr / rawSum) : yCurr / 12.0;
+      }
+    }
+    return out;
+  }
+
+  function interpolateAnnualToMonthlyStock(annualVals) {
+    const nYears = annualVals.length;
+    const out = new Float64Array(nYears * 12);
+    for (let idx = 0; idx < nYears; idx++) {
+      const endVal = Number(annualVals[idx]);
+      const startVal = idx > 0 ? Number(annualVals[idx - 1]) : endVal;
+      for (let m = 0; m < 12; m++) {
+        out[idx * 12 + m] = startVal + ((endVal - startVal) * (m + 1)) / 12.0;
+      }
+    }
+    return out;
+  }
+
+  function buildMonthlyDataJS(annualRows, useSeasonal, cfg) {
+    const revW = useSeasonal ? cfg.revSeasonal : null;
+    const expW = useSeasonal ? cfg.expSeasonal : null;
+    const col = (k) => annualRows.map((r) => r[k]);
+
+    const revFlat = interpolateAnnualToMonthlyFlow(col("revenue_p50"), null);
+    const expFlat = interpolateAnnualToMonthlyFlow(col("expenditure_p50"), null);
+    const revSeas = interpolateAnnualToMonthlyFlow(col("revenue_p50"), revW);
+    const expSeas = interpolateAnnualToMonthlyFlow(col("expenditure_p50"), expW);
+
+    const revP05 = interpolateAnnualToMonthlyFlow(col("revenue_p05"), revW);
+    const revP95 = interpolateAnnualToMonthlyFlow(col("revenue_p95"), revW);
+    const expP05 = interpolateAnnualToMonthlyFlow(col("expenditure_p05"), expW);
+    const expP95 = interpolateAnnualToMonthlyFlow(col("expenditure_p95"), expW);
+
+    const balBase50 = interpolateAnnualToMonthlyFlow(col("net_lending_p50"), null);
+    const balBase05 = interpolateAnnualToMonthlyFlow(col("net_lending_p05"), null);
+    const balBase95 = interpolateAnnualToMonthlyFlow(col("net_lending_p95"), null);
+
+    const debtP50 = interpolateAnnualToMonthlyStock(col("debt_p50"));
+    const dgdpP50 = interpolateAnnualToMonthlyStock(col("debt_gdp_p50"));
+    const dgdpP05 = interpolateAnnualToMonthlyStock(col("debt_gdp_p05"));
+    const dgdpP95 = interpolateAnnualToMonthlyStock(col("debt_gdp_p95"));
+
+    const expPen = interpolateAnnualToMonthlyFlow(col("exp_pensions_bn"), expW);
+    const expSote = interpolateAnnualToMonthlyFlow(col("exp_sote_edu_bn"), expW);
+    const expNatSoc = interpolateAnnualToMonthlyFlow(col("exp_native_social_bn"), expW);
+    const expImmSoc = interpolateAnnualToMonthlyFlow(col("exp_immigrant_social_bn"), expW);
+    const expFixed = interpolateAnnualToMonthlyFlow(col("exp_fixed_other_bn"), expW);
+    const expInt = interpolateAnnualToMonthlyFlow(col("exp_interest_bn"), null);
+
+    const revWage = interpolateAnnualToMonthlyFlow(col("rev_wage_pension_taxes_bn"), revW);
+    const revCons = interpolateAnnualToMonthlyFlow(col("rev_consumption_taxes_bn"), revW);
+    const revClaw = interpolateAnnualToMonthlyFlow(col("rev_social_clawback_bn"), expW);
+    const revCorp = interpolateAnnualToMonthlyFlow(col("rev_corp_capital_property_bn"), revW);
+
+    const rows = [];
+    for (let i = 0; i < annualRows.length; i++) {
+      const yr = annualRows[i].year;
+      for (let m = 0; m < 12; m++) {
+        const idx = i * 12 + m;
+        const delta = (revSeas[idx] - revFlat[idx]) - (expSeas[idx] - expFlat[idx]);
+        const b50 = balBase50[idx] + delta;
+        const b05 = Math.min(b50, balBase05[idx] + delta);
+        const b95 = Math.max(b50, balBase95[idx] + delta);
+        const mm = String(m + 1).padStart(2, "0");
+        rows.push({
+          ym: yr + "-" + mm,
+          date: yr + "-" + mm + "-01",
+          year: yr,
+          month: m + 1,
+          is_historical: yr <= 2025,
+          revenue_p50_meur: revSeas[idx],
+          revenue_p05_meur: revP05[idx],
+          revenue_p95_meur: revP95[idx],
+          expenditure_p50_meur: expSeas[idx],
+          expenditure_p05_meur: expP05[idx],
+          expenditure_p95_meur: expP95[idx],
+          net_lending_p50_meur: b50,
+          net_lending_p05_meur: b05,
+          net_lending_p95_meur: b95,
+          debt_p50_bn: debtP50[idx],
+          debt_gdp_p50: dgdpP50[idx],
+          debt_gdp_p05: dgdpP05[idx],
+          debt_gdp_p95: dgdpP95[idx],
+          exp_pensions_meur: expPen[idx],
+          exp_sote_edu_meur: expSote[idx],
+          exp_native_social_meur: expNatSoc[idx],
+          exp_immigrant_social_meur: expImmSoc[idx],
+          exp_fixed_other_meur: expFixed[idx],
+          exp_interest_meur: expInt[idx],
+          rev_wage_pension_taxes_meur: revWage[idx],
+          rev_consumption_taxes_meur: revCons[idx],
+          rev_social_clawback_meur: revClaw[idx],
+          rev_corp_capital_property_meur: revCorp[idx],
+        });
+      }
+    }
+    return rows;
+  }
+
+  function evaluateVerdictJS(annualRows, crisisEverProbPct, crisisProbByYear, mcDebtGdpLastCol, forecastYears) {
+    const byYear = (yr) => annualRows.find((r) => r.year === yr);
+    const r2025 = byYear(2025);
+    const r2035 = byYear(2035);
+    const r2040 = byYear(2040);
+    const r2050 = byYear(2050);
+    const fc = annualRows.filter((r) => r.year >= 2026);
+
+    let peakDebtGdp = -Infinity;
+    let peakDebtYear = 2026;
+    for (const r of fc) {
+      if (r.debt_gdp_p50 > peakDebtGdp) {
+        peakDebtGdp = r.debt_gdp_p50;
+        peakDebtYear = r.year;
+      }
+    }
+
+    const debt2025 = r2025.debt_gdp_p50;
+    const debt2035 = r2035.debt_gdp_p50;
+    const debt2040 = r2040.debt_gdp_p50;
+    const debt2050 = r2050.debt_gdp_p50;
+    const balGdp2050 = r2050.net_lending_gdp_p50;
+    const intRev2050 = r2050.interest_to_rev_p50;
+
+    const crisisRow = fc.find((r) => r.is_crisis_p50);
+    const medianCrisisYear = crisisRow ? crisisRow.year : null;
+    const idx50 = crisisProbByYear.findIndex((p) => p >= 50.0);
+    const mcCrisisYear = idx50 >= 0 ? forecastYears[idx50] : null;
+    const estCrisisYear = medianCrisisYear || mcCrisisYear;
+
+    const risk90Row = fc.find((r) => r.debt_gdp_p50 > 90.0);
+    const risk90Year = risk90Row ? risk90Row.year : null;
+
+    const debtTurningDown = (debt2050 < peakDebtGdp - 2.0 && debt2050 < debt2040) || (debt2050 < debt2025 - 2.0);
+
+    let statusCode, title, summary;
+    if (medianCrisisYear !== null || crisisEverProbPct >= 50.0 || debt2050 >= 120.0 || intRev2050 >= 15.0) {
+      statusCode = "velkakriisi";
+      title = "AKUUTTI VELKAKRIISI — Julkinen talous ajautuu maksukyvyttömyysuralle";
+      summary =
+        "Valitussa skenaariossa velkasuhde nousee vuoden 2025 tasolta (" + debt2025.toFixed(1) + " %) " +
+        "vuoteen 2050 mennessä mediaanitasolle " + debt2050.toFixed(1) + " % BKT:sta ja korkomenot " +
+        "vievät " + intRev2050.toFixed(1) + " % tuloista. " +
+        (estCrisisYear ? "Kriisiraja (120 % velka/BKT tai 15 % korkomenot tuloista) ylittyy arviolta vuonna " + estCrisisYear + ". " : "") +
+        "Monte Carlo -simulaatioissa kriisirajan ylittymisen todennäköisyys on " + crisisEverProbPct.toFixed(1) + " %.";
+    } else if (debtTurningDown && balGdp2050 >= -1.2 && debt2050 < 98.0 && crisisEverProbPct < 15.0) {
+      statusCode = "kestava";
+      title = "KESTÄVÄ TALOUSKASVU — Velkasuhde taittuu ja rahoitusasema vahvistuu";
+      summary =
+        "Talouskasvu, työllisyyskehitys ja rakenteelliset toimet vakauttavat julkisen talouden. " +
+        "Velkasuhde saavuttaa huippunsa (" + peakDebtGdp.toFixed(1) + " %) vuonna " + peakDebtYear +
+        " ja laskee vuoteen 2050 mennessä tasolle " + debt2050.toFixed(1) + " % BKT:sta " +
+        "(rahoitusjäämä " + (balGdp2050 >= 0 ? "+" : "") + balGdp2050.toFixed(1) + " % BKT:sta). " +
+        "Velkakriisin todennäköisyys on alhainen (" + crisisEverProbPct.toFixed(1) + " %).";
+    } else {
+      statusCode = "naivettyminen";
+      title = "HIDAS NÄIVETTYMINEN JA KOHONNUT VELKARISKI — Rakenteellinen alijäämä jatkuu";
+      summary =
+        "Julkinen talous ei räjähdä välittömään velkakriisiin mediaanipolulla, mutta " +
+        "rakenteellinen alijäämä ja ikääntymismenot pitävät velkasuhteen nousussa (" +
+        debt2025.toFixed(1) + " % vuonna 2025 → " + debt2035.toFixed(1) + " % vuonna 2035 → " +
+        debt2050.toFixed(1) + " % vuonna 2050). Monte Carlo -simulaatioissa akuutin velkakriisin " +
+        "todennäköisyys vuoteen 2050 mennessä on " + crisisEverProbPct.toFixed(1) + " %.";
+    }
+
+    let lowerCount = 0;
+    for (let i = 0; i < mcDebtGdpLastCol.length; i++) {
+      if (mcDebtGdpLastCol[i] < debt2025) lowerCount++;
+    }
+    const probDebtLower2050 = (100.0 * lowerCount) / Math.max(1, mcDebtGdpLastCol.length);
+
+    return {
+      status_code: statusCode,
+      title: title,
+      summary: summary,
+      crisis_ever_prob_pct: Math.round(crisisEverProbPct * 10) / 10,
+      est_crisis_year: estCrisisYear,
+      risk90_year: risk90Year,
+      peak_debt_gdp: Math.round(peakDebtGdp * 10) / 10,
+      peak_debt_year: peakDebtYear,
+      prob_debt_lower_2050_pct: Math.round(probDebtLower2050 * 10) / 10,
+    };
+  }
+
+  function runSimulationJS(cfg, userInputs, nSimOverride) {
+    const t0 = performance.now();
+    const params = cfg.params;
+    const hist = cfg.hist.slice().sort((a, b) => a.year - b.year);
+    const r2025 = hist.find((r) => r.year === 2025);
+    const forecastYears = cfg.forecastYears;
+    const nSteps = forecastYears.length;
+    const nSim = nSimOverride !== undefined ? nSimOverride : params.n_simulations;
+    const nTotal = nSim + 1;
+
+    const randn = makeGaussianRng(params.random_seed);
+    const shocksProd = generateAr1Shocks(randn, nSim, nSteps, params.mc_productivity_phi, params.mc_productivity_sigma);
+    const shocksEmp = generateAr1Shocks(randn, nSim, nSteps, params.mc_employment_phi, params.mc_employment_sigma);
+    const shocksRate = generateAr1Shocks(randn, nSim, nSteps, params.mc_interest_phi, params.mc_interest_sigma);
+    const shocksMig = generateAr1Shocks(randn, nSim, nSteps, params.mc_migration_phi, params.mc_migration_sigma);
+
+    const pop017_25 = Number(r2025.pop_0_17);
+    const popNat1864_25 = Number(r2025.pop_finnish_bg_18_64);
+    const popFor1864_25 = Number(r2025.pop_foreign_bg_18_64);
+    const pop6574_25 = Number(r2025.pop_65_74);
+    const pop75p_25 = Number(r2025.pop_75_plus);
+
+    const sub = cfg.subgroups2025;
+    const subSum = sub.work_immigrants + sub.humanitarian_immigrants + sub.student_immigrants;
+    const immScale = popFor1864_25 / subSum;
+    const baseWorkImm = sub.work_immigrants * immScale;
+    const baseHumImm = sub.humanitarian_immigrants * immScale;
+    const baseStudImm = sub.student_immigrants * immScale;
+
+    const humCurve = cfg.humCurve;
+    const humShareRaw = cfg.humTenureShares;
+    const humShareSum = humShareRaw.reduce((a, b) => a + b, 0);
+    const humShares = humShareRaw.map((v) => v / humShareSum);
+
+    const baseEmpNat = popNat1864_25 * params.native_base_employment_rate;
+    const baseEmpWork = baseWorkImm * params.work_imm_employment_rate;
+    const baseHumBuckets = humShares.map((s) => baseHumImm * s);
+    let baseEmpHum = 0;
+    for (let k = 0; k < 11; k++) baseEmpHum += baseHumBuckets[k] * humCurve[k];
+    const baseEmpStud = baseStudImm * params.student_employment_rate;
+    const baseEmp6574 = pop6574_25 * params.elderly_65_74_employment_rate;
+
+    const baseWageBillBn = (
+      baseEmpNat * params.native_avg_wage_eur +
+      baseEmpWork * params.work_imm_avg_wage_eur +
+      baseEmpHum * params.humanitarian_avg_wage_eur +
+      baseEmpStud * params.student_avg_wage_eur +
+      baseEmp6574 * params.elderly_65_74_avg_wage_eur
+    ) / 1e9;
+
+    const basePensions25Bn = (pop6574_25 + pop75p_25) * params.pension_cost_per_65_plus_eur / 1e9;
+    const baseSote25Bn = (
+      pop017_25 * params.sote_edu_cost_0_17_eur +
+      (popNat1864_25 + popFor1864_25) * params.sote_edu_cost_18_64_eur +
+      pop6574_25 * params.sote_edu_cost_65_74_eur +
+      pop75p_25 * params.sote_edu_cost_75_plus_eur
+    ) / 1e9;
+    const baseNatSoc25Bn = (popNat1864_25 - baseEmpNat) * params.native_social_cost_per_non_emp_eur / 1e9;
+    const baseImmSoc25Bn = (
+      (baseWorkImm - baseEmpWork) * params.work_imm_social_cost_per_non_emp_eur +
+      (baseHumImm - baseEmpHum) * params.humanitarian_social_cost_per_non_emp_eur +
+      (baseHumBuckets[0] + baseHumBuckets[1] + baseHumBuckets[2]) * params.humanitarian_integration_cost_per_recent_eur +
+      (baseStudImm - baseEmpStud) * params.student_social_cost_per_non_emp_eur
+    ) / 1e9;
+
+    const hist25RevBn = Number(r2025.total_revenue_bn);
+    const hist25ExpBn = Number(r2025.total_expenditure_bn);
+    const hist25GdpBn = Number(r2025.nominal_gdp_bn);
+    const hist25DebtBn = Number(r2025.edp_debt_bn);
+    const hist25IntBn = Number(r2025.exp_interest_bn);
+
+    const modelRev25Raw =
+      baseWageBillBn * params.effective_wage_tax_soc_rate +
+      basePensions25Bn * params.pension_income_tax_rate +
+      baseWageBillBn * params.net_disposable_wage_share * params.consumption_tax_rate +
+      params.autonomous_indirect_tax_gdp_share * hist25GdpBn +
+      params.social_clawback_rate * (basePensions25Bn + baseNatSoc25Bn + baseImmSoc25Bn) +
+      params.corp_capital_property_gdp_share * hist25GdpBn;
+    const revCalibAnchor = hist25RevBn / Math.max(1e-6, modelRev25Raw);
+
+    const fixed25AnchorBn = Math.max(
+      10.0,
+      hist25ExpBn - (basePensions25Bn + baseSote25Bn + baseNatSoc25Bn + baseImmSoc25Bn + hist25IntBn)
+    );
+
+    const yProfSum = cfg.youthProfile.reduce((a, b) => a + b, 0);
+    const yProf = cfg.youthProfile.map((v) => (v * pop017_25) / yProfSum);
+    const youthCohorts = new Float64Array(nTotal * 18);
+    const humBuckets = new Float64Array(nTotal * 11);
+    for (let i = 0; i < nTotal; i++) {
+      for (let a = 0; a < 18; a++) youthCohorts[i * 18 + a] = yProf[a];
+      for (let k = 0; k < 11; k++) humBuckets[i * 11 + k] = baseHumBuckets[k];
+    }
+
+    const popNat1864 = new Float64Array(nTotal).fill(popNat1864_25);
+    const popWorkImm = new Float64Array(nTotal).fill(baseWorkImm);
+    const popStudImm = new Float64Array(nTotal).fill(baseStudImm);
+    const pop6574 = new Float64Array(nTotal).fill(pop6574_25);
+    const pop75p = new Float64Array(nTotal).fill(pop75p_25);
+
+    const debtBn = new Float64Array(nTotal).fill(hist25DebtBn);
+    const effDebtRate = new Float64Array(nTotal).fill(hist25IntBn / Math.max(1.0, hist25DebtBn));
+    const prevIntToRev = new Float64Array(nTotal).fill(hist25IntBn / Math.max(1.0, hist25RevBn));
+
+    const cumProd = new Float64Array(nTotal).fill(1.0);
+    const cumSoc = new Float64Array(nTotal).fill(1.0);
+    const cumTyel = new Float64Array(nTotal).fill(1.0);
+    const cumSote = new Float64Array(nTotal).fill(1.0);
+    const cumFixed = new Float64Array(nTotal).fill(1.0);
+    const cumAsset = new Float64Array(nTotal).fill(1.0);
+
+    const matRev = new Float64Array(nTotal * nSteps);
+    const matExp = new Float64Array(nTotal * nSteps);
+    const matBal = new Float64Array(nTotal * nSteps);
+    const matDebt = new Float64Array(nTotal * nSteps);
+    const matGdp = new Float64Array(nTotal * nSteps);
+    const matDebtGdp = new Float64Array(nTotal * nSteps);
+    const matBalGdp = new Float64Array(nTotal * nSteps);
+    const matIntRev = new Float64Array(nTotal * nSteps);
+    const matCrisis = new Uint8Array(nTotal * nSteps);
+
+    const matRevComp = new Float64Array(4 * nTotal * nSteps);
+    const matExpComp = new Float64Array(6 * nTotal * nSteps);
+
+    const detComp = {
+      pop_total: new Float64Array(nSteps),
+      pop_0_17: new Float64Array(nSteps),
+      pop_18_64: new Float64Array(nSteps),
+      pop_65_74: new Float64Array(nSteps),
+      pop_75_plus: new Float64Array(nSteps),
+      employed_total: new Float64Array(nSteps),
+      non_employed_18_64: new Float64Array(nSteps),
+      demo_dependency_ratio: new Float64Array(nSteps),
+      econ_dependency_ratio: new Float64Array(nSteps),
+      eff_debt_rate_pct: new Float64Array(nSteps),
+      marginal_rate_pct: new Float64Array(nSteps),
+      risk_premium_pct: new Float64Array(nSteps),
+    };
+
+    const immRecords = [];
+    const [wShare, hShare, sShare] = normalizedMigrationShares(userInputs);
+    const studStayRate = Math.min(0.95, Math.max(0.05, Number(userInputs.student_stay_rate_pct) / 100.0));
+    const clip = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+
+    for (let t = 0; t < nSteps; t++) {
+      const year = forecastYears[t];
+      const fracT = (t + 1) / nSteps;
+      const policyPhase = Math.min(1.0, (t + 1) / 4.0);
+      const benefitMult = Math.max(0.5, 1.0 + policyPhase * (Number(userInputs.social_benefit_change_pct) / 100.0));
+      const fixedMult = Math.max(0.5, 1.0 + policyPhase * (Number(userInputs.fixed_exp_adjustment_pct) / 100.0));
+      const mort75p = params.mortality_rate_75_plus_2025 + (params.mortality_rate_75_plus_2050 - params.mortality_rate_75_plus_2025) * fracT;
+
+      const humScaled = humCurve.map((c) => clip(c * Number(userInputs.humanitarian_integration_speed), 0.05, 0.84));
+      const rolloverAlpha = 1.0 / params.debt_rollover_years;
+
+      for (let i = 0; i < nTotal; i++) {
+        const yOff = i * 18;
+        const hOff = i * 11;
+        const sIdx = i * nSteps + t;
+
+        let pHumTot = 0;
+        for (let k = 0; k < 11; k++) pHumTot += humBuckets[hOff + k];
+        const p1864Pre = popNat1864[i] + popWorkImm[i] + pHumTot + popStudImm[i];
+        const births = p1864Pre * (0.258 / 25.0) * Number(userInputs.total_fertility_rate);
+
+        const turn18 = youthCohorts[yOff + 17] * (1.0 - params.mortality_rate_0_17);
+        for (let a = 17; a >= 1; a--) {
+          youthCohorts[yOff + a] = youthCohorts[yOff + a - 1] * (1.0 - params.mortality_rate_0_17);
+        }
+        youthCohorts[yOff] = births;
+
+        const retNat = popNat1864[i] / 44.5;
+        const retWork = popWorkImm[i] / 68.0;
+        const mortNat = popNat1864[i] * params.mortality_rate_18_64;
+        const mortWork = popWorkImm[i] * params.mortality_rate_18_64;
+
+        const netMig = Math.max(0.0, Number(userInputs.annual_net_immigration) + shocksMig[sIdx]);
+        const inWork = netMig * wShare;
+        const inHum = netMig * hShare;
+        const inStud = netMig * sShare;
+
+        const gradStud = popStudImm[i] / params.avg_study_duration_years;
+        const stayGrad = gradStud * studStayRate;
+
+        popNat1864[i] = Math.max(100000.0, popNat1864[i] + turn18 - retNat - mortNat);
+        popWorkImm[i] = Math.max(0.0, popWorkImm[i] + inWork + stayGrad - retWork - mortWork);
+        popStudImm[i] = Math.max(0.0, popStudImm[i] + inStud - gradStud);
+
+        let retHumSum = 0;
+        const survHum = new Float64Array(11);
+        for (let k = 0; k < 11; k++) {
+          const hk = humBuckets[hOff + k];
+          const rk = hk / 72.0;
+          const mk = hk * params.mortality_rate_18_64;
+          retHumSum += rk;
+          survHum[k] = Math.max(0.0, hk - rk - mk);
+        }
+        for (let k = 1; k < 10; k++) humBuckets[hOff + k] = survHum[k - 1];
+        humBuckets[hOff + 10] = survHum[9] + survHum[10];
+        humBuckets[hOff] = inHum;
+
+        pHumTot = 0;
+        for (let k = 0; k < 11; k++) pHumTot += humBuckets[hOff + k];
+
+        const totRet65 = retNat + retWork + retHumSum;
+        const ag75 = pop6574[i] * 0.100;
+        const m6574 = pop6574[i] * params.mortality_rate_65_74;
+        pop6574[i] = Math.max(100000.0, pop6574[i] + totRet65 - ag75 - m6574);
+        pop75p[i] = Math.max(100000.0, pop75p[i] + ag75 - pop75p[i] * mort75p);
+
+        let p017 = 0;
+        for (let a = 0; a < 18; a++) p017 += youthCohorts[yOff + a];
+        const p1864 = popNat1864[i] + popWorkImm[i] + pHumTot + popStudImm[i];
+        const p65p = pop6574[i] + pop75p[i];
+        const pTot = p017 + p1864 + p65p;
+
+        const se = shocksEmp[sIdx];
+        const erNat = clip(params.native_base_employment_rate + policyPhase * (Number(userInputs.native_emp_change_pp) / 100.0) + se, 0.45, 0.88);
+        const erWork = clip(params.work_imm_employment_rate + 0.70 * se, 0.50, 0.92);
+        let empHumBase = 0;
+        for (let k = 0; k < 11; k++) empHumBase += humBuckets[hOff + k] * humScaled[k];
+        const empHum = clip(empHumBase + pHumTot * (0.60 * se), 0.0, 0.86 * pHumTot);
+        const erStud = clip(params.student_employment_rate + 0.40 * se, 0.15, 0.75);
+        const er6574 = clip(params.elderly_65_74_employment_rate + 0.25 * se, 0.05, 0.25);
+
+        const empNat = popNat1864[i] * erNat;
+        const empWork = popWorkImm[i] * erWork;
+        const empStud = popStudImm[i] * erStud;
+        const emp6574 = pop6574[i] * er6574;
+        const empTot = empNat + empWork + empHum + empStud + emp6574;
+        const nonEmp1864 = Math.max(0.0, p1864 - (empNat + empWork + empHum + empStud));
+
+        const realProd = clip(Number(userInputs.productivity_growth_pct) / 100.0 + shocksProd[sIdx], -0.05, 0.08);
+        const nomWageG = (1.0 + params.inflation_rate) * (1.0 + realProd) - 1.0;
+        cumProd[i] *= 1.0 + nomWageG;
+        cumSoc[i] *= 1.0 + 0.55 * params.inflation_rate + 0.45 * nomWageG;
+        cumTyel[i] *= 1.0 + 0.60 * params.inflation_rate + 0.40 * nomWageG;
+        const soteG = 0.45 * params.inflation_rate + 0.55 * nomWageG + Number(userInputs.sote_cost_trend_adj_pct) / 100.0;
+        cumSote[i] *= Math.max(0.95, 1.0 + soteG);
+        cumFixed[i] *= 1.0 + 0.50 * params.inflation_rate + 0.50 * nomWageG;
+        cumAsset[i] *= 1.0 + params.inflation_rate + 0.008;
+
+        const wNatBn = (empNat * params.native_avg_wage_eur / 1e9) * cumProd[i];
+        const wWorkBn = (empWork * params.work_imm_avg_wage_eur / 1e9) * cumProd[i];
+        const wHumBn = (empHum * params.humanitarian_avg_wage_eur / 1e9) * cumProd[i];
+        const wStudBn = (empStud * params.student_avg_wage_eur / 1e9) * cumProd[i];
+        const w6574Bn = (emp6574 * params.elderly_65_74_avg_wage_eur / 1e9) * cumProd[i];
+        const totWagesBn = wNatBn + wWorkBn + wHumBn + wStudBn + w6574Bn;
+
+        const realWagesBn = totWagesBn / cumProd[i];
+        const gdp = hist25GdpBn * (realWagesBn / baseWageBillBn) * cumProd[i];
+
+        const expPen = (p65p * params.pension_cost_per_65_plus_eur / 1e9) * cumTyel[i];
+        const expSote = (
+          (p017 * params.sote_edu_cost_0_17_eur +
+           p1864 * params.sote_edu_cost_18_64_eur +
+           pop6574[i] * params.sote_edu_cost_65_74_eur +
+           pop75p[i] * params.sote_edu_cost_75_plus_eur) / 1e9
+        ) * cumSote[i];
+        const expNatSoc = ((popNat1864[i] - empNat) * params.native_social_cost_per_non_emp_eur / 1e9) * cumSoc[i] * benefitMult;
+        const expWorkSoc = ((popWorkImm[i] - empWork) * params.work_imm_social_cost_per_non_emp_eur / 1e9) * cumSoc[i] * benefitMult;
+        const recentHum = humBuckets[hOff] + humBuckets[hOff + 1] + humBuckets[hOff + 2];
+        const expHumSoc = (
+          ((pHumTot - empHum) * params.humanitarian_social_cost_per_non_emp_eur +
+           recentHum * params.humanitarian_integration_cost_per_recent_eur) / 1e9
+        ) * cumSoc[i] * benefitMult;
+        const expStudSoc = ((popStudImm[i] - empStud) * params.student_social_cost_per_non_emp_eur / 1e9) * cumSoc[i] * benefitMult;
+        const expImmSoc = expWorkSoc + expHumSoc + expStudSoc;
+        const expFixed = fixed25AnchorBn * cumFixed[i] * fixedMult;
+
+        const prevDG = debtBn[i] / Math.max(1.0, gdp);
+        const excD = Math.max(0.0, prevDG - params.risk_premium_debt_threshold);
+        const excIR = Math.max(0.0, prevIntToRev[i] - params.risk_premium_interest_rev_threshold);
+        const riskPrem = Math.min(0.08, 0.075 * excD + 0.18 * excIR);
+
+        const margRate = Math.max(0.003, Number(userInputs.base_interest_rate_pct) / 100.0 + shocksRate[sIdx] + riskPrem);
+        effDebtRate[i] = (1.0 - rolloverAlpha) * effDebtRate[i] + rolloverAlpha * margRate;
+        const expInt = debtBn[i] * effDebtRate[i];
+        const totExp = expPen + expSote + expNatSoc + expImmSoc + expFixed + expInt;
+
+        const taxPolRev = policyPhase * (Number(userInputs.tax_rate_change_pp) / 100.0) * gdp;
+        const revWage = (totWagesBn * params.effective_wage_tax_soc_rate + expPen * params.pension_income_tax_rate + 0.55 * taxPolRev) * revCalibAnchor;
+        const revClaw = params.social_clawback_rate * (expPen + expNatSoc + expImmSoc) * revCalibAnchor;
+        const revCons = (totWagesBn * params.net_disposable_wage_share * params.consumption_tax_rate + params.autonomous_indirect_tax_gdp_share * gdp + 0.30 * taxPolRev) * revCalibAnchor;
+        const corpPart = 0.075 * gdp;
+        const assetPart = Math.max(0.0, params.corp_capital_property_gdp_share - 0.075) * hist25GdpBn * cumAsset[i];
+        const revCorp = (corpPart + assetPart + 0.15 * taxPolRev) * revCalibAnchor;
+
+        const totRev = Math.max(1.0, revWage + revCons + revClaw + revCorp);
+        const bal = totRev - totExp;
+        debtBn[i] = Math.max(0.0, debtBn[i] - bal);
+        const dGdpPct = (100.0 * debtBn[i]) / Math.max(1.0, gdp);
+        const bGdpPct = (100.0 * bal) / Math.max(1.0, gdp);
+        const iRevPct = (100.0 * expInt) / Math.max(1.0, totRev);
+        prevIntToRev[i] = iRevPct / 100.0;
+
+        matRev[sIdx] = totRev;
+        matExp[sIdx] = totExp;
+        matBal[sIdx] = bal;
+        matDebt[sIdx] = debtBn[i];
+        matGdp[sIdx] = gdp;
+        matDebtGdp[sIdx] = dGdpPct;
+        matBalGdp[sIdx] = bGdpPct;
+        matIntRev[sIdx] = iRevPct;
+        matCrisis[sIdx] = dGdpPct > 100.0 * params.crisis_debt_threshold || iRevPct > 100.0 * params.crisis_interest_rev_threshold ? 1 : 0;
+
+        const cBase = i * nSteps + t;
+        matRevComp[0 * nTotal * nSteps + cBase] = revWage;
+        matRevComp[1 * nTotal * nSteps + cBase] = revCons;
+        matRevComp[2 * nTotal * nSteps + cBase] = revClaw;
+        matRevComp[3 * nTotal * nSteps + cBase] = revCorp;
+
+        matExpComp[0 * nTotal * nSteps + cBase] = expPen;
+        matExpComp[1 * nTotal * nSteps + cBase] = expSote;
+        matExpComp[2 * nTotal * nSteps + cBase] = expNatSoc;
+        matExpComp[3 * nTotal * nSteps + cBase] = expImmSoc;
+        matExpComp[4 * nTotal * nSteps + cBase] = expFixed;
+        matExpComp[5 * nTotal * nSteps + cBase] = expInt;
+
+        if (i === 0) {
+          detComp.pop_total[t] = pTot;
+          detComp.pop_0_17[t] = p017;
+          detComp.pop_18_64[t] = p1864;
+          detComp.pop_65_74[t] = pop6574[0];
+          detComp.pop_75_plus[t] = pop75p[0];
+          detComp.employed_total[t] = empTot;
+          detComp.non_employed_18_64[t] = nonEmp1864;
+          detComp.demo_dependency_ratio[t] = (100.0 * (pTot - p1864)) / Math.max(1.0, p1864);
+          detComp.econ_dependency_ratio[t] = (100.0 * (pTot - empTot)) / Math.max(1.0, empTot);
+          detComp.eff_debt_rate_pct[t] = 100.0 * effDebtRate[0];
+          detComp.marginal_rate_pct[t] = 100.0 * margRate;
+          detComp.risk_premium_pct[t] = 100.0 * riskPrem;
+
+          const taxAdjMult = 1.0 + policyPhase * (Number(userInputs.tax_rate_change_pp) / 100.0) / 0.43;
+          const corpVaShare = 0.085;
+          const groups = [
+            ["work", "Työperäinen maahanmuutto", popWorkImm[0], wWorkBn, expWorkSoc],
+            ["humanitarian", "Humanitaarinen ja perheside", pHumTot, wHumBn, expHumSoc],
+            ["students", "Kansainväliset opiskelijat", popStudImm[0], wStudBn, expStudSoc],
+          ];
+          for (const [gKey, gLabel, gPop, gWage, gSoc] of groups) {
+            const gRev = (gWage * (params.effective_wage_tax_soc_rate + params.net_disposable_wage_share * params.consumption_tax_rate + corpVaShare) * taxAdjMult + gSoc * params.social_clawback_rate) * revCalibAnchor;
+            const gSote = ((gPop * params.sote_edu_cost_18_64_eur) / 1e9) * cumSote[0] + ((gPop * 5200.0) / 1e9) * cumFixed[0];
+            const gExp = gSoc + gSote;
+            immRecords.push({
+              year: year,
+              group_key: gKey,
+              group_name: gLabel,
+              population: Math.round(gPop),
+              revenue_bn: gRev,
+              social_integration_exp_bn: gSoc,
+              service_sote_exp_bn: gSote,
+              expenditure_bn: gExp,
+              net_fiscal_impact_bn: gRev - gExp,
+            });
+          }
+        }
+      }
+    }
+
+    const mcStart = nSim > 0 ? 1 : 0;
+    const mcCount = nSim > 0 ? nSim : 1;
+    const extractCol = (mat, t) => {
+      const col = new Float64Array(mcCount);
+      for (let k = 0; k < mcCount; k++) col[k] = mat[(mcStart + k) * nSteps + t];
+      return col;
+    };
+    const extractCompCol = (mat, cIdx, t) => {
+      const col = new Float64Array(mcCount);
+      const base = cIdx * nTotal * nSteps;
+      for (let k = 0; k < mcCount; k++) col[k] = mat[base + (mcStart + k) * nSteps + t];
+      return col;
+    };
+
+    const annualRows = [];
+    for (const r of hist) {
+      const rev = Number(r.total_revenue_bn);
+      const exp = Number(r.total_expenditure_bn);
+      const bal = Number(r.net_lending_bn);
+      const debt = Number(r.edp_debt_bn);
+      const gdp = Number(r.nominal_gdp_bn);
+      const dgdp = Number(r.edp_debt_gdp_pct);
+      const bgdp = Number(r.net_lending_gdp_pct);
+      const irev = Number(r.interest_to_revenue_pct);
+      const popW = Number(r.pop_18_64);
+      const empTot = Number(r.employed_15_74_k) * 1000.0;
+      const nonEmp = Math.max(0.0, popW - Number(r.employed_15_64_k) * 1000.0);
+      annualRows.push({
+        year: Number(r.year),
+        is_historical: true,
+        revenue_p05: rev, revenue_p50: rev, revenue_p95: rev,
+        expenditure_p05: exp, expenditure_p50: exp, expenditure_p95: exp,
+        net_lending_p05: bal, net_lending_p50: bal, net_lending_p95: bal,
+        debt_p05: debt, debt_p50: debt, debt_p95: debt,
+        gdp_bn: gdp,
+        debt_gdp_p05: dgdp, debt_gdp_p50: dgdp, debt_gdp_p95: dgdp,
+        net_lending_gdp_p05: bgdp, net_lending_gdp_p50: bgdp, net_lending_gdp_p95: bgdp,
+        interest_to_rev_p05: irev, interest_to_rev_p50: irev, interest_to_rev_p95: irev,
+        crisis_prob_pct: 0.0,
+        is_crisis_p50: false,
+        rev_wage_pension_taxes_bn: Number(r.rev_wage_pension_taxes_bn),
+        rev_consumption_taxes_bn: Number(r.rev_consumption_taxes_bn),
+        rev_social_clawback_bn: Number(r.rev_social_clawback_bn),
+        rev_corp_capital_property_bn: Number(r.rev_corp_capital_property_bn),
+        exp_pensions_bn: Number(r.exp_pensions_bn),
+        exp_sote_edu_bn: Number(r.exp_sote_edu_bn),
+        exp_native_social_bn: Number(r.exp_native_social_bn),
+        exp_immigrant_social_bn: Number(r.exp_immigrant_social_bn),
+        exp_fixed_other_bn: Number(r.exp_fixed_other_bn),
+        exp_interest_bn: Number(r.exp_interest_bn),
+        pop_total: Number(r.pop_total),
+        pop_0_17: Number(r.pop_0_17),
+        pop_18_64: popW,
+        pop_65_74: Number(r.pop_65_74),
+        pop_75_plus: Number(r.pop_75_plus),
+        employed_total: empTot,
+        non_employed_18_64: nonEmp,
+        demo_dependency_ratio: Number(r.demo_dependency_ratio),
+        econ_dependency_ratio: Number(r.econ_dependency_ratio),
+        eff_debt_rate_pct: Math.round((10000.0 * Number(r.exp_interest_bn)) / Math.max(1.0, debt)) / 100.0,
+        marginal_rate_pct: Math.round((10000.0 * Number(r.exp_interest_bn)) / Math.max(1.0, debt)) / 100.0,
+        risk_premium_pct: 0.0,
+      });
+    }
+
+    const crisisProbByYear = new Array(nSteps).fill(0);
+    const detAnnual = [];
+    for (let t = 0; t < nSteps; t++) {
+      const rCol = extractCol(matRev, t);
+      const eCol = extractCol(matExp, t);
+      const bCol = extractCol(matBal, t);
+      const dCol = extractCol(matDebt, t);
+      const gCol = extractCol(matGdp, t);
+      const dgCol = extractCol(matDebtGdp, t);
+      const bgCol = extractCol(matBalGdp, t);
+      const irCol = extractCol(matIntRev, t);
+
+      const rev50 = percentileLinear(rCol, 50);
+      const exp50 = percentileLinear(eCol, 50);
+      const dg50 = percentileLinear(dgCol, 50);
+      const ir50 = percentileLinear(irCol, 50);
+
+      let cHits = 0;
+      for (let k = 0; k < mcCount; k++) {
+        if (matCrisis[(mcStart + k) * nSteps + t]) cHits++;
+      }
+      crisisProbByYear[t] = (100.0 * cHits) / mcCount;
+
+      const rawRevMed = [0, 1, 2, 3].map((c) => percentileLinear(extractCompCol(matRevComp, c, t), 50));
+      const rawRevSum = Math.max(1e-9, rawRevMed.reduce((a, b) => a + b, 0));
+      const alignedRev = rawRevMed.map((v) => v * (rev50 / rawRevSum));
+
+      const rawExpMed = [0, 1, 2, 3, 4, 5].map((c) => percentileLinear(extractCompCol(matExpComp, c, t), 50));
+      const rawExpSum = Math.max(1e-9, rawExpMed.reduce((a, b) => a + b, 0));
+      const alignedExp = rawExpMed.map((v) => v * (exp50 / rawExpSum));
+
+      const p017 = Math.round(detComp.pop_0_17[t]);
+      const p1864 = Math.round(detComp.pop_18_64[t]);
+      const p6574 = Math.round(detComp.pop_65_74[t]);
+      const p75p = Math.round(detComp.pop_75_plus[t]);
+
+      annualRows.push({
+        year: forecastYears[t],
+        is_historical: false,
+        revenue_p05: percentileLinear(rCol, 5),
+        revenue_p50: rev50,
+        revenue_p95: percentileLinear(rCol, 95),
+        expenditure_p05: percentileLinear(eCol, 5),
+        expenditure_p50: exp50,
+        expenditure_p95: percentileLinear(eCol, 95),
+        net_lending_p05: percentileLinear(bCol, 5),
+        net_lending_p50: percentileLinear(bCol, 50),
+        net_lending_p95: percentileLinear(bCol, 95),
+        debt_p05: percentileLinear(dCol, 5),
+        debt_p50: percentileLinear(dCol, 50),
+        debt_p95: percentileLinear(dCol, 95),
+        gdp_bn: percentileLinear(gCol, 50),
+        debt_gdp_p05: percentileLinear(dgCol, 5),
+        debt_gdp_p50: dg50,
+        debt_gdp_p95: percentileLinear(dgCol, 95),
+        net_lending_gdp_p05: percentileLinear(bgCol, 5),
+        net_lending_gdp_p50: percentileLinear(bgCol, 50),
+        net_lending_gdp_p95: percentileLinear(bgCol, 95),
+        interest_to_rev_p05: percentileLinear(irCol, 5),
+        interest_to_rev_p50: ir50,
+        interest_to_rev_p95: percentileLinear(irCol, 95),
+        crisis_prob_pct: crisisProbByYear[t],
+        is_crisis_p50: dg50 > 100.0 * params.crisis_debt_threshold || ir50 > 100.0 * params.crisis_interest_rev_threshold,
+        rev_wage_pension_taxes_bn: alignedRev[0],
+        rev_consumption_taxes_bn: alignedRev[1],
+        rev_social_clawback_bn: alignedRev[2],
+        rev_corp_capital_property_bn: alignedRev[3],
+        exp_pensions_bn: alignedExp[0],
+        exp_sote_edu_bn: alignedExp[1],
+        exp_native_social_bn: alignedExp[2],
+        exp_immigrant_social_bn: alignedExp[3],
+        exp_fixed_other_bn: alignedExp[4],
+        exp_interest_bn: alignedExp[5],
+        pop_total: p017 + p1864 + p6574 + p75p,
+        pop_0_17: p017,
+        pop_18_64: p1864,
+        pop_65_74: p6574,
+        pop_75_plus: p75p,
+        employed_total: detComp.employed_total[t],
+        non_employed_18_64: detComp.non_employed_18_64[t],
+        demo_dependency_ratio: detComp.demo_dependency_ratio[t],
+        econ_dependency_ratio: detComp.econ_dependency_ratio[t],
+        eff_debt_rate_pct: detComp.eff_debt_rate_pct[t],
+        marginal_rate_pct: detComp.marginal_rate_pct[t],
+        risk_premium_pct: detComp.risk_premium_pct[t],
+      });
+
+      detAnnual.push({
+        year: forecastYears[t],
+        rev: matRev[t],
+        exp: matExp[t],
+        bal: matBal[t],
+        debt: matDebt[t],
+        gdp: matGdp[t],
+        debt_gdp: matDebtGdp[t],
+        int_rev: matIntRev[t],
+        exp_interest: matExpComp[5 * nTotal * nSteps + t],
+      });
+    }
+
+    let everCrisisCount = 0;
+    for (let k = 0; k < mcCount; k++) {
+      let hit = false;
+      for (let t = 0; t < nSteps; t++) {
+        if (matCrisis[(mcStart + k) * nSteps + t]) {
+          hit = true;
+          break;
+        }
+      }
+      if (hit) everCrisisCount++;
+    }
+    const crisisEverProbPct = (100.0 * everCrisisCount) / mcCount;
+    const lastDebtGdpCol = extractCol(matDebtGdp, nSteps - 1);
+    const verdict = evaluateVerdictJS(annualRows, crisisEverProbPct, crisisProbByYear, lastDebtGdpCol, forecastYears);
+    const monthlyRows = buildMonthlyDataJS(annualRows, Boolean(userInputs.monthly_seasonal), cfg);
+
+    return {
+      annual: annualRows,
+      monthly: monthlyRows,
+      immigration: immRecords,
+      verdict: verdict,
+      detAnnual: detAnnual,
+      elapsedMs: performance.now() - t0,
+    };
+  }
+
+  root.SimEngine = {
+    runSimulationJS: runSimulationJS,
+    normalizedMigrationShares: normalizedMigrationShares,
+    evaluateVerdictJS: evaluateVerdictJS,
+    buildMonthlyDataJS: buildMonthlyDataJS,
+  };
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = root.SimEngine;
+  }
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+
+<script id="sim-ui">
+(function () {
+  const banner = document.getElementById("no-js-banner");
+  if (banner) banner.style.display = "none";
+
+  const CFG = JSON.parse(document.getElementById("sim-config").textContent);
+  const presetNames = Object.keys(CFG.presets);
+  const defaultPreset = presetNames[0];
+
+  const state = {
+    isMonthly: false,
+    monthlySeasonal: true,
+    viewMode: "unified",
+    activeTab: "tab1",
+    inspectYear: 2035,
+    scenario_name: defaultPreset,
+  };
+  const SLIDERS = [
+    { key: "native_emp_change_pp", group: "1. Työmarkkinat ja talouskasvu", label: "Kantaväestön työllisyysasteen muutos", unit: " %-yks.", min: -5.0, max: 6.0, step: 0.5, dec: 1 },
+    { key: "productivity_growth_pct", group: "1. Työmarkkinat ja talouskasvu", label: "Työn tuottavuuden ja reaalipalkkojen kasvu", unit: " %/v", min: -0.5, max: 3.5, step: 0.1, dec: 1 },
+    { key: "annual_net_immigration", group: "2. Maahanmuutto ja demografia", label: "Vuotuinen nettomaahanmuutto yhteensä", unit: " hlö/v", min: 0, max: 70000, step: 1000, dec: 0 },
+    { key: "work_imm_share_pct", group: "2. Maahanmuutto ja demografia", label: "Osuus työperäistä maahanmuuttoa", unit: " %", min: 0, max: 100, step: 1, dec: 0 },
+    { key: "humanitarian_imm_share_pct", group: "2. Maahanmuutto ja demografia", label: "Osuus humanitaarista ja perheperusteista", unit: " %", min: 0, max: 100, step: 1, dec: 0 },
+    { key: "student_imm_share_pct", group: "2. Maahanmuutto ja demografia", label: "Osuus kansainvälisiä opiskelijoita", unit: " %", min: 0, max: 100, step: 1, dec: 0 },
+    { key: "humanitarian_integration_speed", group: "2. Maahanmuutto ja demografia", label: "Humanitaarisen ryhmän työllistymiskerroin", unit: "x", min: 0.50, max: 1.60, step: 0.05, dec: 2 },
+    { key: "student_stay_rate_pct", group: "2. Maahanmuutto ja demografia", label: "Opiskelijoiden maahanjääntiprosentti", unit: " %", min: 20, max: 90, step: 2, dec: 0 },
+    { key: "total_fertility_rate", group: "2. Maahanmuutto ja demografia", label: "Syntyvyys (kokonaishedelmällisyysluku)", unit: "", min: 1.00, max: 2.00, step: 0.02, dec: 2 },
+    { key: "tax_rate_change_pp", group: "3. Verotus ja menopolitiikka", label: "Kokonaisveroasteen muutos", unit: " %-yks.", min: -4.0, max: 4.0, step: 0.25, dec: 2 },
+    { key: "social_benefit_change_pct", group: "3. Verotus ja menopolitiikka", label: "Sosiaaliturvan tason muutos", unit: " %", min: -20, max: 20, step: 1, dec: 0 },
+    { key: "sote_cost_trend_adj_pct", group: "3. Verotus ja menopolitiikka", label: "Sote-kustannustrendin muutos", unit: " %/v", min: -2.0, max: 2.0, step: 0.1, dec: 1 },
+    { key: "fixed_exp_adjustment_pct", group: "3. Verotus ja menopolitiikka", label: "Kiinteiden menojen sopeutus", unit: " %", min: -15, max: 15, step: 1, dec: 0 },
+    { key: "base_interest_rate_pct", group: "3. Verotus ja menopolitiikka", label: "Valtionvelan peruskorkotaso", unit: " %", min: 1.0, max: 6.0, step: 0.1, dec: 1 },
+  ];
+
+  function loadPreset(name) {
+    const p = CFG.presets[name];
+    state.scenario_name = name;
+    for (const s of SLIDERS) state[s.key] = p[s.key];
+  }
+  loadPreset(defaultPreset);
+
+  function fmtNum(v, dec) {
+    return Number(v).toLocaleString("fi-FI", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  }
+  function fmtEur(v, isMonthly, signed) {
+    const dec = isMonthly ? 0 : 2;
+    const prefix = signed && v > 0 ? "+" : "";
+    return prefix + fmtNum(v, dec) + (isMonthly ? " milj. €/kk" : " mrd. €/v");
+  }
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function niceRange(minV, maxV, forceZero) {
+    let lo = forceZero ? Math.min(0, minV) : minV;
+    let hi = forceZero ? Math.max(0, maxV) : maxV;
+    if (Math.abs(hi - lo) < 1e-6) { lo -= 1; hi += 1; }
+    const pad = (hi - lo) * 0.06;
+    if (lo < 0 || !forceZero) lo -= pad;
+    hi += pad;
+    const rawStep = (hi - lo) / 5;
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / mag;
+    const step = (norm <= 1.2 ? 1 : norm <= 2.5 ? 2 : norm <= 5.5 ? 5 : 10) * mag;
+    const yMin = Math.floor(lo / step) * step;
+    const yMax = Math.ceil(hi / step) * step;
+    const ticks = [];
+    for (let v = yMin; v <= yMax + step * 0.001; v += step) ticks.push(Math.round(v * 1e6) / 1e6);
+    return { yMin: ticks[0], yMax: ticks[ticks.length - 1], ticks };
+  }
+
+  function renderSvgChart(container, opts) {
+    const W = 860;
+    const H = opts.height || 360;
+    const pad = { l: 64, r: 20, t: 22, b: 36 };
+    const pw = W - pad.l - pad.r;
+    const ph = H - pad.t - pad.b;
+    const n = opts.xLabels.length;
+
+    let allY = [];
+    for (const b of opts.bands || []) allY.push(...b.low, ...b.high);
+    for (const s of opts.lines || []) allY.push(...s.y);
+    for (const bar of opts.bars || []) allY.push(...bar.y);
+    for (const hl of opts.hLines || []) allY.push(hl.y);
+    if (opts.stacked && opts.stacked.length) {
+      for (let i = 0; i < n; i++) {
+        let sum = 0;
+        for (const st of opts.stacked) sum += st.y[i];
+        allY.push(sum);
+      }
+      allY.push(0);
+    }
+
+    const range = niceRange(Math.min(...allY), Math.max(...allY), Boolean(opts.forceZero));
+    const xAt = (i) => pad.l + (n <= 1 ? pw / 2 : (i / (n - 1)) * pw);
+    const yAt = (v) => pad.t + ph - ((v - range.yMin) / (range.yMax - range.yMin)) * ph;
+
+    let svg = '<svg viewBox="0 0 ' + W + " " + H + '">';
+    for (const tk of range.ticks) {
+      const yy = yAt(tk);
+      svg += '<line x1="' + pad.l + '" y1="' + yy.toFixed(1) + '" x2="' + (W - pad.r) + '" y2="' + yy.toFixed(1) + '" stroke="#e2e8f0" stroke-width="1"/>';
+      svg += '<text x="' + (pad.l - 8) + '" y="' + (yy + 4).toFixed(1) + '" text-anchor="end" font-size="11" fill="#64748b">' + fmtNum(tk, Math.abs(tk) < 10 && tk % 1 !== 0 ? 1 : 0) + "</text>";
+    }
+
+    const xTickCount = Math.min(8, n);
+    const stepIdx = Math.max(1, Math.round((n - 1) / Math.max(1, xTickCount - 1)));
+    for (let i = 0; i < n; i += stepIdx) {
+      const xx = xAt(i);
+      svg += '<text x="' + xx.toFixed(1) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="11" fill="#64748b">' + escHtml(opts.xTicks ? opts.xTicks[i] : opts.xLabels[i]) + "</text>";
+    }
+
+    if (opts.stacked && opts.stacked.length) {
+      const cumPrev = new Float64Array(n);
+      for (const s of opts.stacked) {
+        const cumNext = new Float64Array(n);
+        for (let i = 0; i < n; i++) cumNext[i] = cumPrev[i] + s.y[i];
+        let d = "M " + xAt(0).toFixed(1) + " " + yAt(cumNext[0]).toFixed(1);
+        for (let i = 1; i < n; i++) d += " L " + xAt(i).toFixed(1) + " " + yAt(cumNext[i]).toFixed(1);
+        for (let i = n - 1; i >= 0; i--) d += " L " + xAt(i).toFixed(1) + " " + yAt(cumPrev[i]).toFixed(1);
+        d += " Z";
+        svg += '<path d="' + d + '" fill="' + s.color + '" fill-opacity="0.78" stroke="' + s.color + '" stroke-width="0.8"/>';
+        for (let i = 0; i < n; i++) cumPrev[i] = cumNext[i];
+      }
+    }
+
+    for (const b of opts.bands || []) {
+      const sIdx = b.startIdx || 0;
+      let d = "M " + xAt(sIdx).toFixed(1) + " " + yAt(b.high[0]).toFixed(1);
+      for (let i = 1; i < b.high.length; i++) d += " L " + xAt(sIdx + i).toFixed(1) + " " + yAt(b.high[i]).toFixed(1);
+      for (let i = b.low.length - 1; i >= 0; i--) d += " L " + xAt(sIdx + i).toFixed(1) + " " + yAt(b.low[i]).toFixed(1);
+      d += " Z";
+      svg += '<path d="' + d + '" fill="' + b.fill + '"/>';
+    }
+
+    if (opts.bars && opts.bars.length === 1 && !opts.groupedBars) {
+      const b = opts.bars[0];
+      const bw = Math.max(1.4, (pw / n) * 0.68);
+      const y0 = yAt(0);
+      for (let i = 0; i < n; i++) {
+        const val = b.y[i];
+        const yv = yAt(val);
+        const top = Math.min(y0, yv);
+        const bh = Math.max(0.8, Math.abs(yv - y0));
+        const col = val >= 0 ? "#16a34a" : "#dc2626";
+        svg += '<rect x="' + (xAt(i) - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" fill="' + col + '" fill-opacity="0.78"/>';
+      }
+    }
+
+    if (opts.groupedBars) {
+      const nGroups = n;
+      const groupW = pw / nGroups;
+      const bw = Math.min(44, groupW * 0.28);
+      const y0 = yAt(0);
+      for (let i = 0; i < nGroups; i++) {
+        const cx = pad.l + (i + 0.5) * groupW;
+        for (let bi = 0; bi < opts.bars.length; bi++) {
+          const val = opts.bars[bi].y[i];
+          const yv = yAt(val);
+          const bx = cx + (bi === 0 ? -bw - 3 : 3);
+          const top = Math.min(y0, yv);
+          const bh = Math.max(1, Math.abs(yv - y0));
+          svg += '<rect x="' + bx.toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" fill="' + opts.bars[bi].color + '" rx="3"/>';
+        }
+        if (opts.diamonds) {
+          const dv = opts.diamonds[i];
+          const dy = yAt(dv);
+          svg += '<polygon points="' + cx + "," + (dy - 7) + " " + (cx + 7) + "," + dy + " " + cx + "," + (dy + 7) + " " + (cx - 7) + "," + dy + '" fill="#2563eb"/>';
+          svg += '<text x="' + cx.toFixed(1) + '" y="' + (dy - 11).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">' + (dv >= 0 ? "+" : "") + fmtNum(dv, opts.dec || 2) + "</text>";
+        }
+      }
+    }
+
+    for (const ln of opts.lines || []) {
+      let d = "M " + xAt(0).toFixed(1) + " " + yAt(ln.y[0]).toFixed(1);
+      for (let i = 1; i < n; i++) d += " L " + xAt(i).toFixed(1) + " " + yAt(ln.y[i]).toFixed(1);
+      const dash = ln.dash ? ' stroke-dasharray="' + ln.dash + '"' : "";
+      svg += '<path d="' + d + '" fill="none" stroke="' + ln.color + '" stroke-width="' + (ln.width || 2.6) + '"' + dash + ' stroke-linejoin="round"/>';
+    }
+
+    for (const hl of opts.hLines || []) {
+      const yy = yAt(hl.y);
+      const dash = hl.dash ? ' stroke-dasharray="' + hl.dash + '"' : "";
+      svg += '<line x1="' + pad.l + '" y1="' + yy.toFixed(1) + '" x2="' + (W - pad.r) + '" y2="' + yy.toFixed(1) + '" stroke="' + hl.color + '" stroke-width="1.5"' + dash + "/>";
+      if (hl.label) {
+        svg += '<text x="' + (W - pad.r - 4) + '" y="' + (yy - 4).toFixed(1) + '" text-anchor="end" font-size="10.5" font-weight="600" fill="' + hl.color + '">' + escHtml(hl.label) + "</text>";
+      }
+    }
+
+    if (opts.dividerIdx !== undefined && opts.dividerIdx !== null) {
+      const xd = (xAt(opts.dividerIdx) + xAt(Math.min(n - 1, opts.dividerIdx + 1))) / 2;
+      svg += '<line x1="' + xd.toFixed(1) + '" y1="' + pad.t + '" x2="' + xd.toFixed(1) + '" y2="' + (H - pad.b) + '" stroke="#64748b" stroke-width="1.6" stroke-dasharray="5 4"/>';
+      svg += '<text x="' + xd.toFixed(1) + '" y="' + (pad.t + 12) + '" text-anchor="middle" font-size="10.5" fill="#475569">Historia | Ennuste</text>';
+    }
+
+    svg += '<line class="crosshair" x1="0" y1="' + pad.t + '" x2="0" y2="' + (H - pad.b) + '" stroke="#0f172a" stroke-width="1" stroke-dasharray="3 3" style="display:none"/>';
+    svg += '<rect class="hit-area" x="' + pad.l + '" y="' + pad.t + '" width="' + pw + '" height="' + ph + '" fill="transparent"/>';
+    svg += "</svg>";
+
+    const legendHtml = (opts.legend || []).map((lg) =>
+      '<span class="legend-item"><span class="swatch" style="background:' + lg.color + '"></span>' + escHtml(lg.label) + "</span>"
+    ).join("");
+
+    container.innerHTML =
+      '<div class="chart-card">' +
+        '<div class="chart-header">' +
+          '<div class="chart-title">' + escHtml(opts.title) + '</div>' +
+          '<div class="chart-readout">Kosketa tai vie osoitin kuvaajaan</div>' +
+        '</div>' +
+        '<div class="svg-wrap">' + svg + "</div>" +
+        (legendHtml ? '<div class="legend">' + legendHtml + "</div>" : "") +
+      "</div>";
+
+    const svgEl = container.querySelector("svg");
+    const hit = container.querySelector(".hit-area");
+    const ch = container.querySelector(".crosshair");
+    const ro = container.querySelector(".chart-readout");
+    function handleMove(ev) {
+      const rect = svgEl.getBoundingClientRect();
+      const svgX = ((ev.clientX - rect.left) / rect.width) * W;
+      let idx;
+      if (opts.groupedBars) {
+        idx = Math.min(n - 1, Math.max(0, Math.floor(((svgX - pad.l) / pw) * n)));
+      } else {
+        idx = Math.min(n - 1, Math.max(0, Math.round(((svgX - pad.l) / pw) * (n - 1))));
+      }
+      const cx = opts.groupedBars ? pad.l + ((idx + 0.5) * pw) / n : xAt(idx);
+      ch.setAttribute("x1", cx.toFixed(1));
+      ch.setAttribute("x2", cx.toFixed(1));
+      ch.style.display = "block";
+      ro.innerHTML = opts.formatReadout(idx);
+    }
+    hit.addEventListener("pointermove", handleMove);
+    hit.addEventListener("pointerdown", handleMove);
+    hit.addEventListener("pointerleave", () => { ch.style.display = "none"; });
+  }
+
+  function renderSidebar() {
+    const sb = document.getElementById("sidebar");
+    let html = "<h2>Ohjauspaneeli</h2>";
+    html += '<div class="ctrl-group"><div class="ctrl-label"><span>Aikaresoluutio</span></div>';
+    html += '<div class="radio-row">' +
+      '<div class="radio-pill ' + (!state.isMonthly ? "active" : "") + '" id="res-yr">Vuositaso (mrd. €/v)</div>' +
+      '<div class="radio-pill ' + (state.isMonthly ? "active" : "") + '" id="res-mo">Kuukausitaso (milj. €/kk)</div>' +
+      "</div>";
+    html += '<label class="check-row"><input type="checkbox" id="chk-seasonal" ' + (state.monthlySeasonal ? "checked" : "") + (!state.isMonthly ? " disabled" : "") + "> Kuukausitason kausivaihtelu</label></div>";
+
+    html += '<div class="ctrl-group"><div class="ctrl-label"><span>Valmis skenaariopohja</span></div>';
+    html += '<select id="sel-preset">' + presetNames.map((n) => '<option value="' + escHtml(n) + '"' + (n === state.scenario_name ? " selected" : "") + ">" + escHtml(n) + "</option>").join("") + "</select>";
+    html += '<div id="preset-desc" class="caption">' + escHtml(CFG.presets[state.scenario_name].description) + "</div></div>";
+
+    let curGrp = "";
+    for (const s of SLIDERS) {
+      if (s.group !== curGrp) {
+        if (curGrp) html += "</div>";
+        curGrp = s.group;
+        html += '<div class="ctrl-group"><h3>' + escHtml(curGrp) + "</h3>";
+      }
+      html += '<div class="ctrl-label"><span>' + escHtml(s.label) + '</span><span class="ctrl-val" id="val_' + s.key + '">' + fmtNum(state[s.key], s.dec) + escHtml(s.unit) + "</span></div>";
+      html += '<input type="range" id="rng_' + s.key + '" min="' + s.min + '" max="' + s.max + '" step="' + s.step + '" value="' + state[s.key] + '">';
+      if (s.key === "student_imm_share_pct") html += '<div id="mig-norm" class="caption"></div>';
+    }
+    html += "</div>";
+    sb.innerHTML = html;
+
+    document.getElementById("res-yr").onclick = () => { state.isMonthly = false; renderAll(); };
+    document.getElementById("res-mo").onclick = () => { state.isMonthly = true; renderAll(); };
+    document.getElementById("chk-seasonal").onchange = (e) => { state.monthlySeasonal = e.target.checked; renderAll(); };
+    document.getElementById("sel-preset").onchange = (e) => { loadPreset(e.target.value); renderAll(); };
+
+    for (const s of SLIDERS) {
+      const el = document.getElementById("rng_" + s.key);
+      el.oninput = (e) => {
+        state[s.key] = Number(e.target.value);
+        document.getElementById("val_" + s.key).textContent = fmtNum(state[s.key], s.dec) + s.unit;
+        updateMigCaption();
+        renderResultsOnly();
+      };
+    }
+    updateMigCaption();
+  }
+
+  function updateMigCaption() {
+    const el = document.getElementById("mig-norm");
+    if (!el) return;
+    const [w, h, s] = window.SimEngine.normalizedMigrationShares(state);
+    const tot = Number(state.annual_net_immigration);
+    el.textContent =
+      "Normalisoitu jako: Työperäinen " + Math.round(w * 100) + " % (" + Math.round(tot * w).toLocaleString("fi-FI") + ") • " +
+      "Hum./perhe " + Math.round(h * 100) + " % (" + Math.round(tot * h).toLocaleString("fi-FI") + ") • " +
+      "Opiskelijat " + Math.round(s * 100) + " % (" + Math.round(tot * s).toLocaleString("fi-FI") + ")";
+  }
+
+  let latestResult = null;
+
+  function renderResultsOnly() {
+    const inputs = Object.assign({ monthly_seasonal: state.monthlySeasonal }, state);
+    const res = window.SimEngine.runSimulationJS(CFG, inputs);
+    latestResult = res;
+    const isM = state.isMonthly;
+    const scale = isM ? 1000.0 / 12.0 : 1.0;
+    const unit = isM ? "milj. €/kk" : "mrd. €/v";
+
+    document.getElementById("app-subtitle").textContent =
+      "Toteutunut historia 2019–2025 (StatFin & Sotkanet) + Monte Carlo -ennuste 2026–2050 (" +
+      CFG.params.n_simulations + " ajoa, " + res.elapsedMs.toFixed(1) + " ms).";
+
+    const v = res.verdict;
+    const vb = document.getElementById("verdict-box");
+    vb.className = "verdict " + v.status_code;
+    const cBadge = v.est_crisis_year ? "Arvioitu kriisirajan ylitysvuosi: <b>" + v.est_crisis_year + "</b>" : "Mediaanipolku ei riko 120 % kriisirajaa ennen vuotta 2050";
+    const r90 = v.risk90_year ? "90 % riskipreemioraja ylittyy: <b>" + v.risk90_year + "</b>" : "Velkasuhde pysyy alle 90 % riskikynnyksen";
+    vb.innerHTML =
+      '<div class="verdict-title">' + escHtml(v.title) + "</div>" +
+      "<div>" + escHtml(v.summary) + "</div>" +
+      '<div class="verdict-meta">• ' + cBadge + " &nbsp;|&nbsp; Kriisitodennäköisyys 2050 mennessä: <b>" + v.crisis_ever_prob_pct.toFixed(1) + " %</b> &nbsp;|&nbsp; " + r90 + " &nbsp;|&nbsp; Todennäköisyys että velkasuhde 2050 &lt; 2025: <b>" + v.prob_debt_lower_2050_pct.toFixed(1) + " %</b></div>";
+
+    document.getElementById("kpi-heading").textContent = "Keskeiset tunnusluvut (" + unit + "): 2025 vs. 2035 vs. 2050";
+    const byY = (yr) => res.annual.find((r) => r.year === yr);
+    const kpiHtml = [[2025, "2025 (Toteutunut)"], [2035, "2035 (Ennuste, mediaani)"], [2050, "2050 (Ennuste, mediaani)"]].map(([yr, lbl]) => {
+      const r = byY(yr);
+      const bVal = r.net_lending_p50 * scale;
+      const bCls = r.net_lending_gdp_p50 >= 0 ? "pos" : "neg";
+      const dCls = r.debt_gdp_p50 > 90 ? "neg" : "";
+      return '<div class="kpi-card"><div class="kpi-head">' + lbl + '</div><div class="kpi-items">' +
+        '<div><div class="kpi-label">Tulot</div><div class="kpi-num">' + fmtEur(r.revenue_p50 * scale, isM, false) + "</div></div>" +
+        '<div><div class="kpi-label">Menot</div><div class="kpi-num">' + fmtEur(r.expenditure_p50 * scale, isM, false) + "</div></div>" +
+        '<div><div class="kpi-label">Rahoitusjäämä</div><div class="kpi-num">' + fmtEur(bVal, isM, true) + '</div><div class="kpi-delta ' + bCls + '">' + (r.net_lending_gdp_p50 >= 0 ? "+" : "") + fmtNum(r.net_lending_gdp_p50, 1) + " % BKT</div></div>" +
+        '<div><div class="kpi-label">Julkinen velka</div><div class="kpi-num">' + fmtNum(r.debt_p50, 1) + ' mrd. €</div><div class="kpi-delta ' + dCls + '">' + fmtNum(r.debt_gdp_p50, 1) + " % BKT</div></div>" +
+        '</div><div class="caption" style="margin-top:8px">Huoltosuhde: dem. <b>' + fmtNum(r.demo_dependency_ratio, 1) + "</b> | tal. <b>" + fmtNum(r.econ_dependency_ratio, 1) + "</b></div></div>";
+    }).join("");
+    document.getElementById("kpi-grid").innerHTML = kpiHtml;
+
+    renderTabs(res);
+  }
+
+  function renderTabs(res) {
+    const isM = state.isMonthly;
+    const dec = isM ? 0 : 2;
+    const unit = isM ? "milj. €/kk" : "mrd. €/v";
+    const src = isM ? res.monthly : res.annual;
+    const xLabels = src.map((r) => (isM ? r.ym : String(r.year)));
+    const xTicks = src.map((r) => (isM ? (r.month === 1 ? String(r.year) : "") : String(r.year)));
+    const fanStart = isM ? src.findIndex((r) => r.ym === "2025-12") : src.findIndex((r) => r.year === 2025);
+    const divIdx = fanStart;
+    const fanSlice = src.slice(fanStart);
+
+    const rev50 = src.map((r) => (isM ? r.revenue_p50_meur : r.revenue_p50));
+    const rev05 = fanSlice.map((r) => (isM ? r.revenue_p05_meur : r.revenue_p05));
+    const rev95 = fanSlice.map((r) => (isM ? r.revenue_p95_meur : r.revenue_p95));
+    const exp50 = src.map((r) => (isM ? r.expenditure_p50_meur : r.expenditure_p50));
+    const exp05 = fanSlice.map((r) => (isM ? r.expenditure_p05_meur : r.expenditure_p05));
+    const exp95 = fanSlice.map((r) => (isM ? r.expenditure_p95_meur : r.expenditure_p95));
+    const bal50 = src.map((r) => (isM ? r.net_lending_p50_meur : r.net_lending_p50));
+    const bal05 = fanSlice.map((r) => (isM ? r.net_lending_p05_meur : r.net_lending_p05));
+    const bal95 = fanSlice.map((r) => (isM ? r.net_lending_p95_meur : r.net_lending_p95));
+
+    // TAB 1
+    const t1 = document.getElementById("tab1");
+    t1.innerHTML =
+      '<div class="radio-row" style="max-width:520px;margin-bottom:10px">' +
+        '<div class="radio-pill ' + (state.viewMode === "unified" ? "active" : "") + '" id="vm-uni">Yhtenäinen pääkuvaaja</div>' +
+        '<div class="radio-pill ' + (state.viewMode === "split" ? "active" : "") + '" id="vm-spl">Jaettu näkymä</div>' +
+      '</div><div id="t1-main"></div><div id="t1-split"></div><div id="t1-bal"></div>';
+    document.getElementById("vm-uni").onclick = () => { state.viewMode = "unified"; renderTabs(res); };
+    document.getElementById("vm-spl").onclick = () => { state.viewMode = "split"; renderTabs(res); };
+
+    if (state.viewMode === "unified") {
+      renderSvgChart(document.getElementById("t1-main"), {
+        title: "Julkisen talouden tulot, menot ja rahoitusjäämä (" + unit + ")",
+        height: 410,
+        xLabels, xTicks, dividerIdx: divIdx, forceZero: true,
+        bands: [
+          { startIdx: fanStart, low: rev05, high: rev95, fill: "rgba(22,163,74,0.16)" },
+          { startIdx: fanStart, low: exp05, high: exp95, fill: "rgba(220,38,38,0.16)" },
+          { startIdx: fanStart, low: bal05, high: bal95, fill: "rgba(37,99,235,0.18)" },
+        ],
+        lines: [
+          { y: rev50, color: "#16a34a", width: 2.8 },
+          { y: exp50, color: "#dc2626", width: 2.8 },
+          { y: bal50, color: "#2563eb", width: 2.8 },
+        ],
+        hLines: [{ y: 0, color: "#334155", dash: "4 4", label: "Tasapaino (0 €)" }],
+        legend: [
+          { color: "#16a34a", label: "Tulot (mediaani & 90 % lv)" },
+          { color: "#dc2626", label: "Menot (mediaani & 90 % lv)" },
+          { color: "#2563eb", label: "Rahoitusjäämä (mediaani & 90 % lv)" },
+        ],
+        formatReadout: (i) =>
+          "<b>" + xLabels[i] + "</b> &nbsp;|&nbsp; <span style='color:#16a34a'>Tulot: " + fmtNum(rev50[i], dec) + "</span> &nbsp;|&nbsp; <span style='color:#dc2626'>Menot: " + fmtNum(exp50[i], dec) + "</span> &nbsp;|&nbsp; <span style='color:#2563eb'>Jäämä: " + (bal50[i] >= 0 ? "+" : "") + fmtNum(bal50[i], dec) + " " + unit + "</span>",
+      });
+    } else {
+      renderSvgChart(document.getElementById("t1-main"), {
+        title: "Julkisyhteisöjen tulot ja menot (" + unit + ")",
+        height: 310,
+        xLabels, xTicks, dividerIdx: divIdx,
+        bands: [
+          { startIdx: fanStart, low: rev05, high: rev95, fill: "rgba(22,163,74,0.16)" },
+          { startIdx: fanStart, low: exp05, high: exp95, fill: "rgba(220,38,38,0.16)" },
+        ],
+        lines: [
+          { y: rev50, color: "#16a34a", width: 2.8 },
+          { y: exp50, color: "#dc2626", width: 2.8 },
+        ],
+        legend: [
+          { color: "#16a34a", label: "Tulot (90 % lv)" },
+          { color: "#dc2626", label: "Menot (90 % lv)" },
+        ],
+        formatReadout: (i) => "<b>" + xLabels[i] + "</b> &nbsp;|&nbsp; Tulot: " + fmtNum(rev50[i], dec) + " &nbsp;|&nbsp; Menot: " + fmtNum(exp50[i], dec) + " " + unit,
+      });
+      renderSvgChart(document.getElementById("t1-split"), {
+        title: "Rahoitusjäämä erilliskuviona (" + unit + ")",
+        height: 260,
+        xLabels, xTicks, dividerIdx: divIdx, forceZero: true,
+        bands: [{ startIdx: fanStart, low: bal05, high: bal95, fill: "rgba(37,99,235,0.18)" }],
+        lines: [{ y: bal50, color: "#2563eb", width: 2.8 }],
+        hLines: [{ y: 0, color: "#334155", dash: "4 4", label: "0 €" }],
+        legend: [{ color: "#2563eb", label: "Rahoitusjäämä (mediaani & 90 % lv)" }],
+        formatReadout: (i) => "<b>" + xLabels[i] + "</b> &nbsp;|&nbsp; Rahoitusjäämä: " + (bal50[i] >= 0 ? "+" : "") + fmtNum(bal50[i], dec) + " " + unit,
+      });
+    }
+
+    renderSvgChart(document.getElementById("t1-bal"), {
+      title: "Rahoitusjäämä (ylijäämä vihreä / alijäämä punainen, " + unit + ")",
+      height: 300,
+      xLabels, xTicks, dividerIdx: divIdx, forceZero: true,
+      bands: [{ startIdx: fanStart, low: bal05, high: bal95, fill: "rgba(37,99,235,0.16)" }],
+      bars: [{ y: bal50 }],
+      lines: [{ y: bal50, color: "#1d4ed8", width: 1.8 }],
+      hLines: [{ y: 0, color: "#0f172a" }],
+      legend: [
+        { color: "#16a34a", label: "Ylijäämä (+)" },
+        { color: "#dc2626", label: "Alijäämä (−)" },
+        { color: "rgba(37,99,235,0.35)", label: "90 % luottamusväli" },
+      ],
+      formatReadout: (i) => "<b>" + xLabels[i] + "</b> &nbsp;|&nbsp; Rahoitusjäämä: " + (bal50[i] >= 0 ? "+" : "") + fmtNum(bal50[i], dec) + " " + unit,
+    });
+
+    // TAB 2
+    const t2 = document.getElementById("tab2");
+    t2.innerHTML =
+      '<div id="t2-exp"></div><div id="t2-rev"></div>' +
+      '<div class="grid-2"><div id="t2-imm-net"></div><div><div class="chart-card"><div class="ctrl-label"><span>Tarkasteluvuosi (tulot vs. menot ryhmittäin)</span><span class="ctrl-val" id="imm-yr-val">' + state.inspectYear + '</span></div><input type="range" id="imm-yr-rng" min="2026" max="2050" step="1" value="' + state.inspectYear + '"><div id="t2-imm-bar"></div></div></div></div>';
+
+    const expKeys = [
+      ["Eläkemenot", isM ? "exp_pensions_meur" : "exp_pensions_bn", "#7c3aed"],
+      ["Sote & koulutus", isM ? "exp_sote_edu_meur" : "exp_sote_edu_bn", "#ec4899"],
+      ["Kantaväestön sos.turva", isM ? "exp_native_social_meur" : "exp_native_social_bn", "#f59e0b"],
+      ["Maahanmuuton sos.turva", isM ? "exp_immigrant_social_meur" : "exp_immigrant_social_bn", "#0ea5e9"],
+      ["Kiinteät menot", isM ? "exp_fixed_other_meur" : "exp_fixed_other_bn", "#64748b"],
+      ["Korkomenot", isM ? "exp_interest_meur" : "exp_interest_bn", "#dc2626"],
+    ];
+    renderSvgChart(document.getElementById("t2-exp"), {
+      title: "Julkisten menojen rakenne (" + unit + ")",
+      height: 360, xLabels, xTicks, dividerIdx: divIdx, forceZero: true,
+      stacked: expKeys.map(([lbl, k, c]) => ({ label: lbl, color: c, y: src.map((r) => r[k]) })),
+      legend: expKeys.map(([lbl, , c]) => ({ color: c, label: lbl })),
+      formatReadout: (i) => "<b>" + xLabels[i] + "</b> &nbsp;|&nbsp; " + expKeys.map(([lbl, k]) => lbl + ": " + fmtNum(src[i][k], dec)).join(" | "),
+    });
+
+    const revKeys = [
+      ["Palkka- & eläkeverot + sotu", isM ? "rev_wage_pension_taxes_meur" : "rev_wage_pension_taxes_bn", "#15803d"],
+      ["Kulutusverot", isM ? "rev_consumption_taxes_meur" : "rev_consumption_taxes_bn", "#22c55e"],
+      ["Sosiaaliturvan ALV-palautus (18 %)", isM ? "rev_social_clawback_meur" : "rev_social_clawback_bn", "#84cc16"],
+      ["Yhteisö-, pääoma- & omaisuustulot", isM ? "rev_corp_capital_property_meur" : "rev_corp_capital_property_bn", "#0d9488"],
+    ];
+    renderSvgChart(document.getElementById("t2-rev"), {
+      title: "Julkisten tulojen rakenne (" + unit + ")",
+      height: 340, xLabels, xTicks, dividerIdx: divIdx, forceZero: true,
+      stacked: revKeys.map(([lbl, k, c]) => ({ label: lbl, color: c, y: src.map((r) => r[k]) })),
+      legend: revKeys.map(([lbl, , c]) => ({ color: c, label: lbl })),
+      formatReadout: (i) => "<b>" + xLabels[i] + "</b> &nbsp;|&nbsp; " + revKeys.map(([lbl, k]) => lbl + ": " + fmtNum(src[i][k], dec)).join(" | "),
+    });
+
+    const immScale = isM ? 1000.0 / 12.0 : 1.0;
+    const immYears = CFG.forecastYears;
+    const immByGrp = (gk) => res.immigration.filter((r) => r.group_key === gk).map((r) => r.net_fiscal_impact_bn * immScale);
+    const wNet = immByGrp("work");
+    const hNet = immByGrp("humanitarian");
+    const sNet = immByGrp("students");
+    renderSvgChart(document.getElementById("t2-imm-net"), {
+      title: "Maahanmuuttoryhmien nettokassavirta 2026–2050 (" + unit + ")",
+      height: 350, xLabels: immYears.map(String), forceZero: true,
+      lines: [
+        { y: wNet, color: "#16a34a", width: 2.8 },
+        { y: hNet, color: "#dc2626", width: 2.8 },
+        { y: sNet, color: "#2563eb", width: 2.8 },
+      ],
+      hLines: [{ y: 0, color: "#334155", dash: "4 4", label: "0 €" }],
+      legend: [
+        { color: "#16a34a", label: "Työperäinen" },
+        { color: "#dc2626", label: "Humanitaarinen & perhe" },
+        { color: "#2563eb", label: "Opiskelijat" },
+      ],
+      formatReadout: (i) => "<b>" + immYears[i] + "</b> &nbsp;|&nbsp; Työ: " + (wNet[i] >= 0 ? "+" : "") + fmtNum(wNet[i], dec) + " | Hum: " + (hNet[i] >= 0 ? "+" : "") + fmtNum(hNet[i], dec) + " | Opisk: " + (sNet[i] >= 0 ? "+" : "") + fmtNum(sNet[i], dec) + " " + unit,
+    });
+
+    function drawImmBar(yr) {
+      const sub = res.immigration.filter((r) => r.year === yr);
+      renderSvgChart(document.getElementById("t2-imm-bar"), {
+        title: "Tulot vs. menot vuonna " + yr + " (" + unit + ")",
+        height: 300,
+        xLabels: ["Työperäinen", "Hum. & perhe", "Opiskelijat"],
+        groupedBars: true,
+        forceZero: true,
+        dec: dec,
+        bars: [
+          { color: "#16a34a", y: sub.map((r) => r.revenue_bn * immScale) },
+          { color: "#dc2626", y: sub.map((r) => r.expenditure_bn * immScale) },
+        ],
+        diamonds: sub.map((r) => r.net_fiscal_impact_bn * immScale),
+        hLines: [{ y: 0, color: "#334155" }],
+        legend: [
+          { color: "#16a34a", label: "Verotulot" },
+          { color: "#dc2626", label: "Sos.turva + palvelut" },
+          { color: "#2563eb", label: "Nettovaikutus" },
+        ],
+        formatReadout: (i) => "<b>" + sub[i].group_name + "</b> &nbsp;|&nbsp; Tulot: " + fmtNum(sub[i].revenue_bn * immScale, dec) + " | Menot: " + fmtNum(sub[i].expenditure_bn * immScale, dec) + " | Netto: " + (sub[i].net_fiscal_impact_bn >= 0 ? "+" : "") + fmtNum(sub[i].net_fiscal_impact_bn * immScale, dec),
+      });
+    }
+    drawImmBar(state.inspectYear);
+    document.getElementById("imm-yr-rng").oninput = (e) => {
+      state.inspectYear = Number(e.target.value);
+      document.getElementById("imm-yr-val").textContent = state.inspectYear;
+      drawImmBar(state.inspectYear);
+    };
+
+    // TAB 3
+    const t3 = document.getElementById("tab3");
+    t3.innerHTML =
+      '<div class="grid-2"><div id="t3-debt"></div><div id="t3-int"></div></div><div id="t3-pop"></div>' +
+      '<div class="chart-card"><div class="chart-header"><div class="chart-title">Numeerinen simulointidata (' + (isM ? "384 kk" : "32 v") + ')</div><button class="btn" id="btn-csv" style="width:auto">Lataa CSV-tiedosto</button></div><div class="table-wrap" id="t3-tbl"></div></div>';
+
+    const dg50 = src.map((r) => r.debt_gdp_p50);
+    const dg05 = fanSlice.map((r) => r.debt_gdp_p05);
+    const dg95 = fanSlice.map((r) => r.debt_gdp_p95);
+    renderSvgChart(document.getElementById("t3-debt"), {
+      title: "Julkisen velkasuhteen kehitys (% BKT:sta)",
+      height: 350, xLabels, xTicks, dividerIdx: divIdx, forceZero: true,
+      bands: [{ startIdx: fanStart, low: dg05, high: dg95, fill: "rgba(109,40,217,0.18)" }],
+      lines: [{ y: dg50, color: "#6d28d9", width: 3 }],
+      hLines: [
+        { y: 60, color: "#16a34a", dash: "3 3", label: "60 % EU" },
+        { y: 90, color: "#d97706", dash: "5 4", label: "90 % Riskipreemio" },
+        { y: 100, color: "#ea580c", dash: "5 4", label: "100 % Varoitus" },
+        { y: 120, color: "#dc2626", label: "120 % Kriisiraja" },
+      ],
+      legend: [{ color: "#6d28d9", label: "EDP-velka / BKT (mediaani & 90 % lv)" }],
+      formatReadout: (i) => "<b>" + xLabels[i] + "</b> &nbsp;|&nbsp; Velkasuhde: " + fmtNum(dg50[i], 1) + " % BKT:sta",
+    });
+
+    const ann = res.annual;
+    const annLabels = ann.map((r) => String(r.year));
+    const annFanStart = ann.findIndex((r) => r.year === 2025);
+    const annFan = ann.slice(annFanStart);
+    const ir50 = ann.map((r) => r.interest_to_rev_p50);
+    const effR = ann.map((r) => r.eff_debt_rate_pct);
+    renderSvgChart(document.getElementById("t3-int"), {
+      title: "Korkomenot / Tulot (%) ja velkakannan keskikorko (%)",
+      height: 350, xLabels: annLabels, dividerIdx: annFanStart, forceZero: true,
+      bands: [{ startIdx: annFanStart, low: annFan.map((r) => r.interest_to_rev_p05), high: annFan.map((r) => r.interest_to_rev_p95), fill: "rgba(220,38,38,0.16)" }],
+      lines: [
+        { y: ir50, color: "#b91c1c", width: 2.8 },
+        { y: effR, color: "#0284c7", width: 2.2, dash: "4 3" },
+      ],
+      hLines: [
+        { y: 8, color: "#ea580c", dash: "5 4", label: "8 % Riskipreemio" },
+        { y: 15, color: "#dc2626", label: "15 % Kriisiraja" },
+      ],
+      legend: [
+        { color: "#b91c1c", label: "Korkomenot / Tulot (%)" },
+        { color: "#0284c7", label: "Keskikorko (%)" },
+      ],
+      formatReadout: (i) => "<b>" + annLabels[i] + "</b> &nbsp;|&nbsp; Korkomenot/tulot: " + fmtNum(ir50[i], 2) + " % | Keskikorko: " + fmtNum(effR[i], 2) + " %",
+    });
+
+    const popSeries = [
+      ["Työlliset (18–64 v)", ann.map((r) => Math.max(0, r.pop_18_64 - r.non_employed_18_64) / 1e6), "#16a34a"],
+      ["Ei-työlliset (18–64 v)", ann.map((r) => r.non_employed_18_64 / 1e6), "#f59e0b"],
+      ["Eläkeläiset 65–74 v", ann.map((r) => r.pop_65_74 / 1e6), "#3b82f6"],
+      ["Eläkeläiset 75+ v", ann.map((r) => r.pop_75_plus / 1e6), "#7c3aed"],
+      ["Lapset 0–17 v", ann.map((r) => r.pop_0_17 / 1e6), "#06b6d4"],
+    ];
+    renderSvgChart(document.getElementById("t3-pop"), {
+      title: "Väestörakenteen kehitys (miljoonaa henkilöä)",
+      height: 340, xLabels: annLabels, dividerIdx: annFanStart, forceZero: true,
+      stacked: popSeries.map(([lbl, y, c]) => ({ label: lbl, color: c, y })),
+      legend: popSeries.map(([lbl, , c]) => ({ color: c, label: lbl })),
+      formatReadout: (i) => "<b>" + annLabels[i] + "</b> &nbsp;|&nbsp; Väkiluku: " + (ann[i].pop_total / 1e6).toFixed(3) + " milj. | 75+ v: " + (ann[i].pop_75_plus / 1e6).toFixed(3) + " milj.",
+    });
+
+    let tblHtml = "<table><thead><tr>";
+    const cols = isM
+      ? ["Kuukausi", "Jakso", "Tulot (M€)", "Menot (M€)", "Jäämä (M€)", "Velka (mrd €)", "Velka/BKT %"]
+      : ["Vuosi", "Jakso", "Tulot (mrd €)", "Menot (mrd €)", "Jäämä (mrd €)", "BKT (mrd €)", "Velka/BKT %", "Korko/tulot %", "Väestö"];
+    tblHtml += cols.map((c) => "<th>" + c + "</th>").join("") + "</tr></thead><tbody>";
+    for (const r of src) {
+      tblHtml += "<tr>";
+      if (isM) {
+        tblHtml += "<td>" + r.ym + "</td><td>" + (r.is_historical ? "Historia" : "Ennuste") + "</td>" +
+          "<td>" + fmtNum(r.revenue_p50_meur, 1) + "</td><td>" + fmtNum(r.expenditure_p50_meur, 1) + "</td>" +
+          "<td>" + fmtNum(r.net_lending_p50_meur, 1) + "</td><td>" + fmtNum(r.debt_p50_bn, 2) + "</td><td>" + fmtNum(r.debt_gdp_p50, 2) + "</td>";
+      } else {
+        tblHtml += "<td>" + r.year + "</td><td>" + (r.is_historical ? "Historia" : "Ennuste") + "</td>" +
+          "<td>" + fmtNum(r.revenue_p50, 2) + "</td><td>" + fmtNum(r.expenditure_p50, 2) + "</td>" +
+          "<td>" + fmtNum(r.net_lending_p50, 2) + "</td><td>" + fmtNum(r.gdp_bn, 2) + "</td>" +
+          "<td>" + fmtNum(r.debt_gdp_p50, 1) + "</td><td>" + fmtNum(r.interest_to_rev_p50, 2) + "</td><td>" + Number(r.pop_total).toLocaleString("fi-FI") + "</td>";
+      }
+      tblHtml += "</tr>";
+    }
+    tblHtml += "</tbody></table>";
+    document.getElementById("t3-tbl").innerHTML = tblHtml;
+
+    document.getElementById("btn-csv").onclick = () => {
+      const headers = isM
+        ? ["Kuukausi", "Jakso", "Tulot_milj_EUR", "Menot_milj_EUR", "Rahoitusjaama_milj_EUR", "Velka_mrd_EUR", "Velkasuhde_pct_BKT"]
+        : ["Vuosi", "Jakso", "Tulot_mrd_EUR", "Menot_mrd_EUR", "Rahoitusjaama_mrd_EUR", "BKT_mrd_EUR", "Velka_mrd_EUR", "Velkasuhde_pct_BKT", "Korkomenot_pct_tuloista", "Vaesto"];
+      const lines = [headers.join(",")];
+      for (const r of src) {
+        if (isM) {
+          lines.push([r.ym, r.is_historical ? "Historia" : "Ennuste", r.revenue_p50_meur.toFixed(1), r.expenditure_p50_meur.toFixed(1), r.net_lending_p50_meur.toFixed(1), r.debt_p50_bn.toFixed(2), r.debt_gdp_p50.toFixed(2)].join(","));
+        } else {
+          lines.push([r.year, r.is_historical ? "Historia" : "Ennuste", r.revenue_p50.toFixed(2), r.expenditure_p50.toFixed(2), r.net_lending_p50.toFixed(2), r.gdp_bn.toFixed(2), r.debt_p50.toFixed(2), r.debt_gdp_p50.toFixed(1), r.interest_to_rev_p50.toFixed(2), r.pop_total].join(","));
+        }
+      }
+      const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = isM ? "suomi_julkistalous_kuukausidata.csv" : "suomi_julkistalous_vuosidata.csv";
+      a.click();
+    };
+
+    // TAB 4
+    const t4 = document.getElementById("tab4");
+    const statusRows = Object.entries(CFG.sourceStatus || {}).map(([k, val]) => "<li><b>" + escHtml(k) + ":</b> " + escHtml(val) + "</li>").join("");
+    t4.innerHTML =
+      '<div class="meth-card">' +
+      "<h2>Mallin metodologia ja kannettava offline-versio</h2>" +
+      "<p>Tämä itsenäinen HTML-sovellus sisältää täydellisen demografia-, vero-, meno-, korko-, velka- ja 800 polun AR(1) Monte Carlo -simulointimoottorin suoraan selaimessa. Kaikki laskenta tapahtuu paikallisesti ilman verkkopalvelinta tai asennuksia.</p>" +
+      "<h3>1. Historiadata (2019–2025)</h3>" +
+      "<p>Pohjadatana on upotettuna Tilastokeskuksen StatFin- (<code>122g</code>, <code>15ah</code>, <code>15a9</code>, <code>11rs</code>, <code>13aj</code>) ja THL:n Sotkanet-tilastot (<code>ind. 761</code>) aikaleimalla <b>" + escHtml(CFG.updatedAt || "-") + "</b>:</p>" +
+      "<ul>" + statusRows + "</ul>" +
+      "<h3>2. Keskeiset oletukset ja kaavat</h3>" +
+      "<ul>" +
+        "<li><b>Väestökohortit:</b> 0–17 v (18 ikäluokkaa), työikäinen kantaväestö, työperäinen maahanmuutto, humanitaarinen &amp; perheperusteinen maahanmuutto (11-portainen maassaoloajan työllisyyskäyrä 14 % → 61 %), kansainväliset opiskelijat sekä eläkeikäiset 65–74 v ja 75+ v.</li>" +
+        "<li><b>Verotus ja kulutusveropalautus:</b> Palkkaverot &amp; sotu 56 %, eläkevero 22,5 %, kulutusverot 21,5 %, sekä <b>18 % sosiaaliturvan ja eläkkeiden ALV-palautus (clawback)</b>.</li>" +
+        "<li><b>Menot ja ikääntyminen:</b> Sote- ja koulutuskustannus 75+ -ryhmässä 24 500 €/v (vs. 4 200 €/v työikäisillä).</li>" +
+        "<li><b>Velkadynamiikka:</b> 7 v jälleenrahoitusmaturiteetti, nouseva riskipreemio velkasuhteen ylittäessä 90 % tai korkomenojen ylittäessä 8 % tuloista, sekä akuutti kriisiraja 120 % / 15 %.</li>" +
+        "<li><b>Monte Carlo:</b> 800 AR(1)-autokorreloitua polkua tuottavuudelle, työllisyydelle, korkotasolle ja nettomaahanmuutolle (5., 50. ja 95. persentiili).</li>" +
+      "</ul>" +
+      "<h3>3. Käyttöohje puhelimella (WhatsApp / Android / iPhone)</h3>" +
+      "<p><b>Android:</b> Napauta liitetiedostoa ja valitse selaimeksi <b>Chrome</b>.<br><b>iPhone:</b> WhatsAppin sisäinen esikatselu estää JavaScriptin, joten valitse esikatselun ylä- tai alakulmasta <b>Jaa (⍐) → Avaa Safarissa</b> (tai tallenna Tiedostoihin ja avaa Safarissa).</p>" +
+      "</div>";
+  }
+
+  document.getElementById("mobile-toggle").onclick = () => {
+    document.getElementById("sidebar").classList.toggle("open");
+  };
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.onclick = () => {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      const id = btn.getAttribute("data-tab");
+      state.activeTab = id;
+      document.getElementById(id).classList.add("active");
+    };
+  });
+
+  function renderAll() {
+    renderSidebar();
+    renderResultsOnly();
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
