@@ -3,12 +3,14 @@
 > [!WARNING]
 > **Vastuuvapauslauseke / Disclaimer:** Tämä sovellus on **100 % vibekoodattu Gemini 3.8 Flash High -mallilla**, eikä esitettyjen lukujen, historiallisten poimintojen, parametrien tai ennusteiden oikeellisuudesta anneta **mitään takuita**. Sovellus on tarkoitettu ainoastaan havainnollistavaan ja kokeelliseen tarkasteluun, eikä sitä tule käyttää virallisen päätöksenteon tai taloudellisen neuvonnan perustana.
 
-👉 **[Avaa SuomiSimulaattori suoraan selaimessa](https://markorastas.github.io/SuomiSimulaattori/suomi_simulator.html)**
+👉 **[Avaa SuomiSimulaattori suoraan selaimessa](https://markorastas.github.io/SuomiSimulaattori/)** *(suora tiedostolinkki: https://markorastas.github.io/SuomiSimulaattori/suomi_simulator.html)*
 
 **SuomiSimulaattori** ([`suomi_simulator.html`](suomi_simulator.html)) on täysin itsenäinen, yhden HTML-tiedoston kokoinen selainpohjainen Suomen julkisen talouden simulointityökalu. Se yhdistää tiedostoon upotetun vuosien 2019–2025 tilastohistorian sekä vuoteen 2050 ulottuvan deterministisen ja 800 kierroksen Monte Carlo -ennustemallin ilman ulkoisia kirjastoja, palvelimia tai asennuksia.
 
+**Lisenssi:** Koodi **MIT** ([`LICENSE`](LICENSE)), dokumentaatio & tilastolähteet **CC BY 4.0** — © 2026 **Marko Rastas** (katso tarkemmat ehdot ja mainintaohje alta [Osa 4](#osa-4-lisenssit-tekijänoikeudet-ja-tietolähteet)).
+
 ### Pikakäyttö
-* **Suoraan verkossa:** Klikkaa yllä olevaa linkkiä ([Avaa SuomiSimulaattori suoraan selaimessa](https://markorastas.github.io/SuomiSimulaattori/suomi_simulator.html)) — toimii suoraan sekä tietokoneella että puhelimessa (Android & iPhone).
+* **Suoraan verkossa:** Klikkaa yllä olevaa linkkiä ([Avaa SuomiSimulaattori suoraan selaimessa](https://markorastas.github.io/SuomiSimulaattori/)) — toimii suoraan sekä tietokoneella että puhelimessa (Android & iPhone).
 * **Paikallisesti tietokoneella:** Lataa [`suomi_simulator.html`](suomi_simulator.html) ja avaa se kaksoisklikkaamalla missä tahansa selaimessa (toimii myös ilman nettiyhteyttä).
 * **Paikallisen tiedoston jako puhelimeen (esim. WhatsApp):** Androidissa napauta tiedostoa ja valitse **Chrome**; iPhonessa WhatsAppin sisäinen esikatselu estää JavaScriptin (näkyy keltainen varoituspalkki), joten valitse **Jaa (`⍐`) → Avaa Safarissa**.
 
@@ -335,3 +337,22 @@ Skripti piilottaa `#no-js-banner`-elementin, jäsentää `#sim-config`-JSON:n va
 * **`renderAll()` (ei parametreja):** Kutsuu peräkkäin `renderSidebar()`- ja `renderResultsOnly()`-funktiot; ajetaan sivun alustuksessa sekä aikaresoluution tai valmisskenaarion vaihtuessa.
 * **`#mobile-toggle.onclick`:** Kytkee mobiilissa `.sidebar`-elementin `open`-luokan päälle/pois.
 * **`.tab-btn.onclick`:** Vaihtaa aktiivisen välilehtipainikkeen ja vastaavan `.tab-panel`-osion (`tab1`–`tab4`) näkyväksi.
+
+---
+
+## Osa 4: Lisenssit, tekijänoikeudet ja tietolähteet
+
+### 4.1 Ohjelmakoodin lisenssi (`MIT`)
+* **Koskee tiedostoja:** [`suomi_simulator.html`](suomi_simulator.html), [`index.html`](index.html) ja [`LICENSE`](LICENSE)
+* **Lisenssi:** Standardi **MIT-lisenssi** (`SPDX-License-Identifier: MIT`), `Copyright (c) 2026 Marko Rastas`.
+* **Käyttöehdot:** Koodia saa käyttää, kopioida, muokata, yhdistää, julkaista ja levittää vapaasti (myös kaupallisesti) sellaisenaan ilman takuita (`AS IS`), kunhan **alkuperäinen tekijänoikeusilmoitus (`Copyright (c) 2026 Marko Rastas`) ja MIT-lisenssiteksti säilytetään** kaikissa kopioissa ja olennaisissa osissa. Jos hyödynnät projektia tai sen laskentamallia omassa työssäsi, mainitsethan tekijän (**Marko Rastas**).
+
+### 4.2 Dokumentaation ja mallimateriaalin lisenssi (`CC BY 4.0`)
+* **Koskee:** Tätä [`readme.md`](readme.md)-dokumentaatiota, kaavakuvauksia ja esittelytekstejä.
+* **Lisenssi:** **Creative Commons Attribution 4.0 International (CC BY 4.0)**, tekijä **Marko Rastas**.
+* **Käyttöehdot:** Materiaalia saa jakaa ja muokata vapaasti mihin tahansa tarkoitukseen (myös kaupallisesti), kunhan **tekijä (`Marko Rastas`) mainitaan asianmukaisesti**, tarjotaan linkki lisenssiin (https://creativecommons.org/licenses/by/4.0/) ja ilmoitetaan mahdollisesti tehdyistä muutoksista.
+
+### 4.3 Tilastoaineistojen lähteet ja lisenssit (`CC BY 4.0`)
+Sovellus ei sisällä kolmannen osapuolen JavaScript- tai CSS-kirjastoja. Tiedostoon upotettu vuosien 2019–2025 tilastoaineisto (`#sim-config`) pohjautuu avoimen datan **CC BY 4.0** -rajapintoihin:
+* **Tilastokeskus — StatFin:** Taulut `122g` (EDP-alijäämä ja -velka), `15ah` (julkisyhteisöjen tulot ja menot), `15a9` (BKT), `11rs` (väestö iän ja syntyperän mukaan) ja `13aj` (työllisyys) — https://stat.fi (**CC BY 4.0**).
+* **Terveyden ja hyvinvoinnin laitos (THL) — Sotkanet:** Indikaattori `761` (*Väestöllinen huoltosuhde*, alkuperäislähde Tilastokeskus / THL) — https://sotkanet.fi (**CC BY 4.0**).
